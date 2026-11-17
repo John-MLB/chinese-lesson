@@ -123,7 +123,7 @@ function closeNote(){
 noteDialog.addEventListener('cancel',event=>{event.preventDefault();closeNote()});
 function layoutReading(anchorId){
  const board=document.querySelector('.continuous-board');if(!board)return;
- const font=115;
+ const font=95;
  board.style.fontSize=font+'px';
  const availableHeight=board.clientHeight-16,capacity=Math.max(3,Math.floor(availableHeight/font));
  board.style.setProperty('--reading-rows',capacity);
