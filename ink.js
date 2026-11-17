@@ -42,8 +42,20 @@ function bindPenPress(target,tap,hold,schedule=setTimeout,unschedule=clearTimeou
  target.onkeydown=e=>{if(e.key==='ArrowDown'){e.preventDefault();hold()}};
  return {cancel};
 }
+// A held light pointer never becomes a saved stroke or intercepts controls.
+function bindLightPen(root,{allowed,show,move,hide}){
+ let active=null;
+ const stop=()=>{if(active===null)return;const id=active;active=null;hide();if(root.hasPointerCapture?.(id))root.releasePointerCapture(id)};
+ const down=e=>{if(active!==null||!allowed()||e.isPrimary===false||e.button!==0||e.target.closest('button,a,input,select,textarea,[role="button"]'))return;active=e.pointerId;e.preventDefault();root.setPointerCapture?.(active);show(e)};
+ const drag=e=>{if(e.pointerId!==active)return;if(!allowed()){stop();return}e.preventDefault();move(e)};
+ const end=e=>{if(e.pointerId===active)stop()};
+ const menu=e=>{if(allowed()&&!e.target.closest('button,a,input,select,textarea,[role="button"]'))e.preventDefault()};
+ const events={pointerdown:down,pointermove:drag,pointerup:end,pointercancel:end,lostpointercapture:end,contextmenu:menu};
+ for(const [name,fn]of Object.entries(events))root.addEventListener(name,fn);
+ return {stop,destroy(){stop();for(const [name,fn]of Object.entries(events))root.removeEventListener(name,fn)}};
+}
 // Pure helpers are shared by the browser and the small regression check.
-if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance,bindPenPress};return}
+if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance,bindPenPress,bindLightPen};return}
 try{const saved=localStorage.getItem(STORAGE);if(saved)book=validate(JSON.parse(saved))}catch{localProblem=true}
 function saveLocal(){clearTimeout(saveTimer);try{localStorage.setItem(STORAGE,JSON.stringify(book));localProblem=false;return true}catch{localProblem=true;toast('這台電腦暫時無法自動保存，請按「存檔」下載筆記檔。');return false}}
 function remember(before){past.push(before);if(past.length>25)past.shift();future=[];saveTimer=setTimeout(saveLocal,300);updatePanel();}
@@ -52,13 +64,13 @@ function host(){const d=document.getElementById('lesson-note');return d?.open?d:
 function closePanel(){panel?.remove();panel=null}
 function setMode(next){finishGesture();mode=next;closePanel();syncMode()}
 function syncMode(){
- touchCursor.hidden=true;document.body.classList.remove('custom-arrow');
+ surface?.light?.stop();
  document.querySelectorAll('.ink-layer').forEach(el=>{el.classList.toggle('ink-active',mode!=='view'&&el===surface?.svg);el.classList.toggle('ink-erase',mode==='eraser')});
  document.querySelectorAll('[data-ink-action]').forEach(b=>{const selected=(b.dataset.inkAction==='erase'&&mode==='eraser')||(b.dataset.inkAction==='paint'&&['pen','line'].includes(mode));b.classList.toggle('ink-selected',selected);if(['paint','erase'].includes(b.dataset.inkAction))b.setAttribute('aria-pressed',String(selected));else b.removeAttribute('aria-pressed')});
  document.querySelectorAll('.ink-mode-banner').forEach(e=>e.remove());
  if(mode!=='view'&&surface){const b=document.createElement('button');b.className='ink-mode-banner';b.textContent=({pen:'手繪',line:'直線',eraser:'橡皮擦'}[mode])+'中・完成書寫';b.onclick=()=>setMode('view');host().append(b)}
 }
-function toolMarkup(){return `<button class="rail-control" data-ink-action="paint" aria-label="畫筆：輕點切換，長按設定" title="輕點：書寫／滑鼠；長按：畫筆設定"><span class="ink-tool-symbol" aria-hidden="true">✎</span><span>畫筆</span></button><button class="rail-control" data-ink-action="erase" aria-label="橡皮擦（擦除整筆）"><span class="ink-tool-symbol" aria-hidden="true">▱</span><span>橡皮擦</span></button><button class="rail-control" data-ink-action="undo" data-history="undo" aria-label="上一步：復原筆跡" title="上一步：復原筆跡"><span class="ink-tool-symbol" aria-hidden="true">↶</span><span>上一步</span></button><button class="rail-control" data-ink-action="redo" data-history="redo" aria-label="下一步：重做筆跡" title="下一步：重做筆跡"><span class="ink-tool-symbol" aria-hidden="true">↷</span><span>下一步</span></button><button class="rail-control" data-ink-action="save" aria-label="儲存與開啟筆記"><span class="ink-tool-symbol" aria-hidden="true">▣</span><span>存檔</span></button>`}
+function toolMarkup(){return `<button class="rail-control" data-ink-action="paint" aria-label="畫筆：輕點切換，長按設定" title="輕點：書寫／光筆；長按：畫筆設定"><span class="ink-tool-symbol" aria-hidden="true">✎</span><span>畫筆</span></button><button class="rail-control" data-ink-action="erase" aria-label="橡皮擦（擦除整筆）"><span class="ink-tool-symbol" aria-hidden="true">▱</span><span>橡皮擦</span></button><button class="rail-control" data-ink-action="undo" data-history="undo" aria-label="上一步：復原筆跡" title="上一步：復原筆跡"><span class="ink-tool-symbol" aria-hidden="true">↶</span><span>上一步</span></button><button class="rail-control" data-ink-action="redo" data-history="redo" aria-label="下一步：重做筆跡" title="下一步：重做筆跡"><span class="ink-tool-symbol" aria-hidden="true">↷</span><span>下一步</span></button><button class="rail-control" data-ink-action="save" aria-label="儲存與開啟筆記"><span class="ink-tool-symbol" aria-hidden="true">▣</span><span>存檔</span></button>`}
 const penPresses=new WeakMap();
 function setupTools(){
  document.querySelectorAll('.nav-rail').forEach(rail=>{if(!rail.querySelector('[data-ink-action]'))rail.insertAdjacentHTML('beforeend',toolMarkup());rail.querySelectorAll('[data-ink-action]').forEach(b=>b.hidden=!document.body.classList.contains('reading-mode'));rail.dataset.inkSide=rail.classList.contains('nav-rail-left')?'left':'right'});
@@ -77,11 +89,11 @@ function openPanel(kind,side){
  const h=document.createElement('h2');h.textContent=kind==='paint'?'畫筆工具':'我的課堂筆記';el.append(h);
  if(kind==='paint'){
   const grid=document.createElement('div');grid.className='ink-grid';
-  [['滑鼠','view'],['手繪','pen'],['直線','line'],['橡皮擦','eraser']].forEach(([label,value])=>{const b=button(label,()=>setMode(value));b.classList.toggle('primary',mode===value);grid.append(b)});el.append(grid);
+  [['光筆','view'],['手繪','pen'],['直線','line'],['橡皮擦','eraser']].forEach(([label,value])=>{const b=button(label,()=>setMode(value));b.classList.toggle('primary',mode===value);grid.append(b)});el.append(grid);
   const colors=document.createElement('div');colors.className='ink-colors';COLORS.forEach((c,i)=>{const b=button('',()=>{color=c;openPanel('paint',side)});b.setAttribute('aria-label',['紅色','藍色','黑色','綠色'][i]);b.setAttribute('aria-pressed',String(color===c));b.classList.toggle('ink-selected',color===c);const dot=document.createElement('span');dot.className='ink-swatch';dot.style.background=c;b.append(dot);colors.append(b)});el.append(colors);
   const sizes=document.createElement('div');sizes.className='ink-grid';[3,6,10].forEach((n,i)=>{const b=button(['細筆','中筆','粗筆'][i],()=>{width=n;openPanel('paint',side)});b.classList.toggle('primary',width===n);sizes.append(b)});el.append(sizes);
   const history=document.createElement('div');history.className='ink-grid';const undo=button('上一步',()=>undoRedo(false));undo.dataset.history='undo';const redo=button('下一步',()=>undoRedo(true));redo.dataset.history='redo';history.append(undo,redo);el.append(history);
-  const hint=document.createElement('p');hint.textContent='輕點畫筆：書寫／滑鼠。長按畫筆：開啟設定。上一步可復原，下一步可重做。橡皮擦會擦掉整筆。';el.append(hint);
+  const hint=document.createElement('p');hint.textContent='輕點畫筆：書寫／光筆。長按畫筆：開啟設定。光筆按住發光、拖曳留淡影，放開即消失，不會存成筆跡。';el.append(hint);
  }else{
   const hint=document.createElement('p');hint.textContent='筆跡會自動記在這台電腦的此瀏覽器。請另存筆記檔，以免清除瀏覽器資料後遺失。';el.append(hint);
   [['下載筆記到本機',download],['存到同步資料夾',saveFolder],['開啟筆記檔',importFile]].forEach(([label,action])=>{const b=button(label,action);b.className='ink-full';el.append(b)});
@@ -157,33 +169,56 @@ function finishGesture(cancel=false){
  if(g.stroke){(book.surfaces[surface.key]||=[]).push(g.stroke);try{validate(book)}catch{book=g.before;toast('這份筆記已達容量上限，請先存檔。');redraw();return}}
  if(JSON.stringify(g.before.surfaces)!==JSON.stringify(book.surfaces))remember(g.before);redraw();
 }
-function beforeChange(){document.querySelectorAll('[data-ink-action="paint"]').forEach(b=>penPresses.get(b)?.cancel());finishGesture();closePanel();setMode('view');surface?.observer?.disconnect();surface?.svg.remove();surface=null}
+function beforeChange(){document.querySelectorAll('[data-ink-action="paint"]').forEach(b=>penPresses.get(b)?.cancel());finishGesture();closePanel();setMode('view');surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null}
 function refresh(){
- finishGesture();surface?.observer?.disconnect();surface?.svg.remove();surface=null;setupTools();
+ finishGesture();surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null;setupTools();
  const dialog=document.getElementById('lesson-note'),root=dialog.open?dialog.querySelector('.note-paper'):document.querySelector('.continuous-board');
  if(!root){syncMode();return}
  const key=dialog.open?'note:'+dialog.dataset.note:'lesson8';
  if(key!=='lesson8')root.querySelectorAll('h1,h3,p,.takeaway,img,figcaption').forEach((el,i)=>el.dataset.inkBlock='b'+i);
- const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('ink-layer');svg.setAttribute('aria-hidden','true');root.append(svg);surface={root,key,svg,anchors:new Map()};
+ const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('ink-layer');svg.setAttribute('aria-hidden','true');root.append(svg);surface={root,key,svg,anchors:new Map()};surface.light=createLightPen(root);
  svg.addEventListener('pointerdown',begin);svg.addEventListener('pointermove',move);svg.addEventListener('pointerup',e=>{if(gesture?.id===e.pointerId){move(e);finishGesture()}});svg.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)finishGesture(true)});svg.addEventListener('lostpointercapture',e=>{if(gesture?.id===e.pointerId)finishGesture()});
  const observer=new ResizeObserver(()=>{if(surface?.svg===svg)redraw()});observer.observe(root);surface.observer=observer;root.querySelectorAll('img').forEach(img=>img.addEventListener('load',()=>{if(surface?.svg===svg)redraw()},{once:true}));redraw();syncMode();
 }
-const touchCursor=document.createElement('div');touchCursor.className='touch-arrow';touchCursor.hidden=true;touchCursor.setAttribute('aria-hidden','true');
-touchCursor.innerHTML='<svg viewBox="0 0 32 40"><path d="M3 2 L3 31 L11 24 L17 37 L23 34 L17 22 L29 22 Z" fill="white" stroke="#172b29" stroke-width="2" stroke-linejoin="round"/></svg>';
-function moveCursor(e){
- if(!e.isPrimary)return;
- if(e.pointerType!=='mouse'&&mode!=='view'){touchCursor.hidden=true;document.body.classList.remove('custom-arrow');return}
- const parent=host();if(touchCursor.parentNode!==parent)parent.append(touchCursor);
- const d=parent===document.body?{left:0,top:0}:parent.getBoundingClientRect();
- touchCursor.style.left=(e.clientX-d.left)+'px';touchCursor.style.top=(e.clientY-d.top)+'px';touchCursor.hidden=false;document.body.classList.toggle('custom-arrow',e.pointerType==='mouse');
+// Light follows contact only. Coordinates stay local to the visible reading surface.
+function createLightPen(root){
+ const canvas=document.createElement('canvas');canvas.className='light-pen-layer';canvas.hidden=true;canvas.setAttribute('aria-hidden','true');root.append(canvas);
+ const ctx=canvas.getContext('2d');let frame=0,points=[],head=null,started=0,radius=21.25;
+ const local=e=>{const r=root.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}};
+ const stop=()=>{cancelAnimationFrame(frame);frame=0;points=[];head=null;canvas.hidden=true;root.classList.remove('light-pen-held');ctx.clearRect(0,0,canvas.width,canvas.height)};
+ const paint=now=>{
+  if(!head)return;
+  ctx.clearRect(0,0,canvas.width,canvas.height);points=points.filter(p=>now-p.t<460);
+  // Short connected segments taper and fade toward the oldest point.
+  for(let i=1;i<points.length;i++){
+   const a=points[i-1],b=points[i],life=Math.max(0,1-(now-b.t)/460);
+   ctx.strokeStyle=`rgba(28,203,67,${life*.42})`;ctx.lineWidth=Math.max(1,radius*1.35*life);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+  }
+  const breath=.68+.17*Math.sin((now-started)*Math.PI*2/1800);
+  const glow=ctx.createRadialGradient(head.x,head.y,0,head.x,head.y,radius);
+  glow.addColorStop(0,`rgba(110,255,125,${breath})`);glow.addColorStop(.55,`rgba(20,218,60,${breath})`);glow.addColorStop(.8,`rgba(8,176,49,${breath*.55})`);glow.addColorStop(1,'rgba(8,176,49,0)');
+  ctx.fillStyle=glow;ctx.beginPath();ctx.arc(head.x,head.y,radius,0,Math.PI*2);ctx.fill();frame=requestAnimationFrame(paint);
+ };
+ const binding=bindLightPen(root,{
+  allowed:()=>mode==='view'&&!panel,
+  show:e=>{
+   stop();const scale=Math.min(window.devicePixelRatio||1,2),w=root.clientWidth,h=root.clientHeight;
+   canvas.width=Math.ceil(w*scale);canvas.height=Math.ceil(h*scale);canvas.style.width=w+'px';canvas.style.height=h+'px';ctx.setTransform(scale,0,0,scale,0,0);
+   radius=(parseFloat(document.querySelector('.continuous-board')?.style.fontSize)||85)/4;
+   started=performance.now();head=local(e);points=[{...head,t:started}];canvas.hidden=false;root.classList.add('light-pen-held');frame=requestAnimationFrame(paint);
+  },
+  move:e=>{
+   const next=local(e),now=performance.now(),dist=Math.hypot(next.x-head.x,next.y-head.y);
+   if(dist>1){points.push({...next,t:now});if(points.length>240)points.shift()}head=next;
+  },
+  hide:stop
+ });
+ return {stop:binding.stop,destroy(){binding.destroy();stop();canvas.remove()}};
 }
-document.addEventListener('pointerdown',moveCursor,true);document.addEventListener('pointermove',moveCursor,true);
-document.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')queueMicrotask(()=>moveCursor(e))},true);
-const hideCursor=()=>{touchCursor.hidden=true;document.body.classList.remove('custom-arrow')};
-window.addEventListener('blur',hideCursor);document.addEventListener('pointerout',e=>{if(!e.relatedTarget)hideCursor()});
+window.addEventListener('blur',()=>surface?.light?.stop());
 window.lessonInk={beforeChange,refresh};
-window.addEventListener('pagehide',()=>{finishGesture();saveLocal()});
-document.addEventListener('visibilitychange',()=>{if(document.hidden){finishGesture();saveLocal()}});
+window.addEventListener('pagehide',()=>{surface?.light?.stop();finishGesture();saveLocal()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){surface?.light?.stop();finishGesture();saveLocal()}});
 document.fonts?.ready.then(()=>{if(surface)redraw()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel){e.preventDefault();e.stopImmediatePropagation();closePanel()}else if(e.key==='Escape'&&mode!=='view'){e.preventDefault();e.stopImmediatePropagation();setMode('view')}},true);
 })();

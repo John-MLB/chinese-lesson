@@ -32,3 +32,26 @@ function fixture(){const target={},timers=new Map();let seq=0,taps=0,holds=0;con
  const f=fixture();f.target.onpointerdown(f.e());f.handle.cancel();f.run();assert.deepEqual(f.counts(),[0,0]);
 }
 console.log('PASS: short tap, long hold, release suppression, move/cancel and keyboard click');
+const {bindLightPen}=require('./ink.js');
+function lightFixture(){
+ const events={};let enabled=true,captured=null,shows=0,moves=0,hides=0;
+ const root={addEventListener:(n,f)=>events[n]=f,removeEventListener:n=>delete events[n],setPointerCapture:id=>captured=id,hasPointerCapture:id=>captured===id,releasePointerCapture:()=>captured=null};
+ const handle=bindLightPen(root,{allowed:()=>enabled,show:()=>shows++,move:()=>moves++,hide:()=>hides++});
+ const e=(extra={})=>({pointerId:1,isPrimary:true,button:0,target:{closest:()=>null},preventDefault(){},...extra});
+ return {events,handle,e,enable:v=>enabled=v,counts:()=>[shows,moves,hides],captured:()=>captured};
+}
+{
+ const f=lightFixture();f.events.pointermove(f.e());assert.deepEqual(f.counts(),[0,0,0]);
+ f.events.pointerdown(f.e());f.events.pointermove(f.e());assert.deepEqual(f.counts(),[1,1,0]);assert.equal(f.captured(),1);
+ f.events.pointerup(f.e({pointerId:2}));assert.deepEqual(f.counts(),[1,1,0]);
+ f.events.pointerup(f.e());f.events.pointermove(f.e());assert.deepEqual(f.counts(),[1,1,1]);assert.equal(f.captured(),null);
+}
+{
+ const f=lightFixture();f.enable(false);f.events.pointerdown(f.e());f.enable(true);
+ f.events.pointerdown(f.e({target:{closest:()=>({})}}));f.events.pointerdown(f.e({button:2}));f.events.pointerdown(f.e({isPrimary:false}));assert.deepEqual(f.counts(),[0,0,0]);
+ f.events.pointerdown(f.e());f.events.pointercancel(f.e());assert.deepEqual(f.counts(),[1,0,1]);
+ f.events.pointerdown(f.e());f.events.lostpointercapture(f.e());assert.deepEqual(f.counts(),[2,0,2]);
+ f.events.pointerdown(f.e());f.enable(false);f.events.pointermove(f.e());assert.deepEqual(f.counts(),[3,0,3]);
+ f.enable(true);f.events.pointerdown(f.e());f.handle.destroy();assert.deepEqual(f.counts(),[4,0,4]);assert.equal(Object.keys(f.events).length,0);
+}
+console.log('PASS: light contact/release, drag, control exclusion, drawing exclusion and cancellation cleanup');
