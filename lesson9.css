@@ -1,0 +1,27 @@
+/* Lesson 9 shares the classroom typeface, rails and 85px text of Lesson 8. */
+.lesson9-catalogue{max-width:2000px;margin:auto;padding-top:1vh}
+.lesson9-catalogue>h1{font-size:clamp(38px,4.2vw,90px)}
+.lesson9-menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:28px 0}
+.lesson9-menu .card{position:relative;min-height:205px;padding:24px 28px}
+.lesson9-menu .card h2{font-size:clamp(30px,2.7vw,64px);margin:18px 0 8px}
+.lesson9-menu .card p{font-size:clamp(20px,1.6vw,36px)}
+.lesson9-card-icon{float:right;font-size:54px;line-height:1;color:var(--green)}
+.lesson9-source{font-size:19px;color:#65776b}
+.lesson9-board{display:block;padding:0;font-size:85px;overflow:hidden}
+.lesson9-cell{position:absolute;display:flex;align-items:flex-start;justify-content:center;min-height:0}
+.lesson9-cell .flow-char{font-size:85px}
+.lesson9-cell .learning-word{color:#005ead}
+.lesson9-cell.flow-number-slot{align-items:center}
+.lesson9-cell.flow-indent .flow-paragraph-label{right:-22px;top:0;font-size:25px;line-height:1.15}
+.lesson9-cell.flow-indent .inline-number{top:0}
+.country-gallery{position:absolute;display:flex;flex-direction:column;gap:8px;background:#fff;overflow:hidden;font-size:24px;border-top:2px solid #d0dcd0;padding-top:8px}
+.country-gallery-title{font-size:26px;line-height:1.1;color:var(--green);flex:none}
+.country-pictures{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:10px;flex:1;min-height:0}
+.country-picture{margin:0;min-width:0;min-height:0;display:flex;flex-direction:column;gap:4px}
+.country-picture svg{display:block;flex:1;min-height:0;width:100%;overflow:hidden}
+.country-picture figcaption{font-size:clamp(17px,1.3vw,29px);line-height:1.1;flex:none;text-align:center}
+.country-picture.wide{grid-column:1/-1}
+.country-pictures.count-3:not(:has(.wide)) .country-picture:first-child{grid-row:1/3}
+[data-lesson-menu]{font-weight:700}
+@media(max-width:900px){.lesson9-menu{grid-template-columns:1fr 1fr;gap:14px}.lesson9-menu .card{padding:20px;min-height:185px}.lesson9-source{font-size:15px}}
+@media(max-width:600px){.lesson9-menu{grid-template-columns:1fr}.lesson9-card-icon{font-size:42px}.country-gallery-title{font-size:19px}.country-picture figcaption{font-size:14px}.country-pictures{gap:5px}.lesson9-source{display:none}}

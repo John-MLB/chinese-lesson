@@ -7,21 +7,24 @@ const strokeWidth=s=>s.tool==='highlight'?({3:22,6:34,10:48})[s.width]:s.width;
 const NOTE_IDS=['sentence','definition','idiom','examples','giraffe','benefits','meaning','excerpt'];
 const MAX_POINTS=150000, MAX_BYTES=12*1024*1024;
 const clone=value=>JSON.parse(JSON.stringify(value));
-let book={format:'chinese-lesson-notes',version:1,lesson:'lesson8',surfaces:{}};
+const emptyBook=lesson=>({format:'chinese-lesson-notes',version:1,lesson,surfaces:{}});
+const storageKey=lesson=>lesson==='lesson8'?STORAGE:STORAGE+'-'+lesson;
+let book=emptyBook('lesson8');
+const lessonSessions=new Map();
 let past=[],future=[],mode='view',color=COLORS[0],width=3,surface=null,panel=null,gesture=null,saveTimer,toastTimer;
 let localProblem=false;
 function validate(raw){
- if(!raw||raw.format!=='chinese-lesson-notes'||raw.version!==1||raw.lesson!=='lesson8'||!raw.surfaces||typeof raw.surfaces!=='object'||Array.isArray(raw.surfaces))throw Error('這不是本站的第八課筆記檔。');
- const clean={format:raw.format,version:1,lesson:'lesson8',surfaces:{}};let count=0,total=0;
+ if(!raw||raw.format!=='chinese-lesson-notes'||raw.version!==1||!['lesson8','lesson9'].includes(raw.lesson)||!raw.surfaces||typeof raw.surfaces!=='object'||Array.isArray(raw.surfaces))throw Error('這不是本站的課堂筆記檔。');
+ const clean={format:raw.format,version:1,lesson:raw.lesson,surfaces:{}};let count=0,total=0;
  for(const [key,strokes] of Object.entries(raw.surfaces)){
-  if(key!=='lesson8'&&!NOTE_IDS.includes(key.replace(/^note:/,'')))throw Error('筆記頁面名稱不正確。');
-  if(key!=='lesson8'&&!key.startsWith('note:'))throw Error('筆記頁面名稱不正確。');
+  if(key!==raw.lesson&&!(raw.lesson==='lesson8'&&NOTE_IDS.includes(key.replace(/^note:/,''))))throw Error('筆記頁面名稱不正確。');
+  if(key!==raw.lesson&&!key.startsWith('note:'))throw Error('筆記頁面名稱不正確。');
   if(!Array.isArray(strokes)||(total+=strokes.length)>5000)throw Error('筆記筆數太多。');
   clean.surfaces[key]=strokes.map(s=>{
    if(!s||!(s.tool==='highlight'?HIGHLIGHT_COLORS:COLORS).includes(s.color)||![3,6,10].includes(s.width)||!['pen','line','highlight'].includes(s.tool)||!Array.isArray(s.points)||s.points.length<1||s.points.length>12000)throw Error('筆跡資料不完整。');
    count+=s.points.length;if(count>MAX_POINTS)throw Error('筆記太大，請分成不同檔案保存。');
    const points=s.points.map(p=>{
-    const pattern=key==='lesson8'?/^p[0-4]-l\d{1,2}-c\d{1,3}$/:/^b\d{1,3}$/;
+    const pattern=key==='lesson8'?/^p[0-4]-l\d{1,2}-c\d{1,3}$/:key==='lesson9'?/^p[0-3]-(?:l\d{1,2}-(?:c\d{1,3}|indent|number)|image[0-3])$/:/^b\d{1,3}$/;
     if(!p||typeof p.a!=='string'||!pattern.test(p.a)||![p.x,p.y].every(v=>Number.isFinite(v)&&Math.abs(v)<=30))throw Error('筆跡座標不正確。');
     return {a:p.a,x:p.x,y:p.y};
    });return {tool:s.tool,color:s.color,width:s.width,points};
@@ -57,9 +60,19 @@ function bindLightPen(root,{allowed,show,move,hide}){
  return {stop,destroy(){stop();for(const [name,fn]of Object.entries(events))root.removeEventListener(name,fn)}};
 }
 // Pure helpers are shared by the browser and the small regression check.
-if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance,bindPenPress,bindLightPen,strokeWidth};return}
+if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance,bindPenPress,bindLightPen,strokeWidth,storageKey};return}
 try{const saved=localStorage.getItem(STORAGE);if(saved)book=validate(JSON.parse(saved))}catch{localProblem=true}
-function saveLocal(){clearTimeout(saveTimer);try{localStorage.setItem(STORAGE,JSON.stringify(book));localProblem=false;return true}catch{localProblem=true;toast('這台電腦暫時無法自動保存，請按「存檔」下載筆記檔。');return false}}
+function saveLocal(){clearTimeout(saveTimer);try{localStorage.setItem(storageKey(book.lesson),JSON.stringify(book));localProblem=false;return true}catch{localProblem=true;toast('這台電腦暫時無法自動保存，請按「存檔」下載筆記檔。');return false}}
+function activateLesson(lesson){
+ if(book.lesson===lesson)return;
+ finishGesture();saveLocal();
+ lessonSessions.set(book.lesson,{book,past,future,localProblem});
+ const session=lessonSessions.get(lesson);
+ if(session){({book,past,future,localProblem}=session)}else{
+  book=emptyBook(lesson);past=[];future=[];localProblem=false;
+  try{const saved=localStorage.getItem(storageKey(lesson));if(saved){const loaded=validate(JSON.parse(saved));if(loaded.lesson!==lesson)throw Error('課別不符');book=loaded}}catch{localProblem=true}
+ }
+}
 function remember(before){past.push(before);if(past.length>25)past.shift();future=[];saveTimer=setTimeout(saveLocal,300);updatePanel();}
 function toast(message){clearTimeout(toastTimer);document.querySelectorAll('.ink-toast').forEach(e=>e.remove());const el=document.createElement('div');el.className='ink-toast';el.setAttribute('role','status');el.textContent=message;host().append(el);toastTimer=setTimeout(()=>el.remove(),6000)}
 function host(){const d=document.getElementById('lesson-note');return d?.open?d:document.body}
@@ -107,12 +120,12 @@ function updatePanel(){document.querySelectorAll('[data-history]').forEach(b=>b.
 function undoRedo(redo){finishGesture();const from=redo?future:past,to=redo?past:future;if(!from.length)return;to.push(clone(book));book=from.pop();saveLocal();redraw();updatePanel()}
 function stamp(){return new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}
 function serialized(){return JSON.stringify({...book,savedAt:new Date().toISOString()},null,2)}
-function download(){finishGesture();saveLocal();const url=URL.createObjectURL(new Blob([serialized()],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='國語第八課筆記-'+stamp()+'.json';host().append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('已送出筆記檔下載，請在瀏覽器下載項目中確認。')}
+function download(){finishGesture();saveLocal();const url=URL.createObjectURL(new Blob([serialized()],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='國語第'+(book.lesson==='lesson9'?'九':'八')+'課筆記-'+stamp()+'.json';host().append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('已送出筆記檔下載，請在瀏覽器下載項目中確認。')}
 async function saveFolder(){
  finishGesture();saveLocal();
  if(!window.showSaveFilePicker){toast('此瀏覽器不支援選資料夾存檔。請下載筆記檔，再放入電腦的同步資料夾。');return}
  try{
-  const handle=await window.showSaveFilePicker({id:'chinese-lesson-notes',suggestedName:'國語第八課筆記-'+stamp()+'.json',types:[{description:'可繼續編輯的課堂筆記',accept:{'application/json':['.json']}}]});
+  const handle=await window.showSaveFilePicker({id:'chinese-lesson-notes',suggestedName:'國語第'+(book.lesson==='lesson9'?'九':'八')+'課筆記-'+stamp()+'.json',types:[{description:'可繼續編輯的課堂筆記',accept:{'application/json':['.json']}}]});
   const writable=await handle.createWritable();try{await writable.write(serialized());await writable.close()}catch(err){try{await writable.abort()}catch{}throw err}
   toast('筆記已存入所選資料夾。若為同步資料夾，請由同步程式確認雲端上傳。');
  }catch(err){if(err.name!=='AbortError'){console.warn('Note file save:',err.name,err.message);toast('這次無法直接寫入資料夾，請改用「下載筆記到本機」，再移入同步資料夾。')}}
@@ -121,7 +134,7 @@ function importFile(){
  const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.hidden=true;host().append(input);
  input.oncancel=()=>input.remove();input.onchange=async()=>{
   const file=input.files[0];input.remove();if(!file)return;
-  try{if(file.size>MAX_BYTES)throw Error('檔案太大，無法開啟。');const incoming=validate(JSON.parse(await file.text()));
+  try{if(file.size>MAX_BYTES)throw Error('檔案太大，無法開啟。');const incoming=validate(JSON.parse(await file.text()));if(incoming.lesson!==book.lesson)throw Error('這份筆記屬於第'+(incoming.lesson==='lesson9'?'九':'八')+'課，請先進入該課再開啟。');
    const apply=()=>{const before=clone(book);book=incoming;remember(before);saveLocal();setMode('view');redraw();toast('已開啟筆記，可以繼續書寫。')};
    if(Object.values(book.surfaces).some(s=>s.length)){
     const side=panel?.classList.contains('right')?'right':'left';closePanel();panel=document.createElement('section');panel.className='ink-panel '+side;panel.setAttribute('aria-label','確認開啟筆記');
@@ -133,7 +146,7 @@ function importFile(){
 }
 function geometry(){
  if(!surface)return;const root=surface.root,base=root.getBoundingClientRect();surface.base=base;
- surface.anchors=new Map();const nodes=surface.key==='lesson8'?root.querySelectorAll('[data-token]'):root.querySelectorAll('[data-ink-block]');
+ surface.anchors=new Map();const nodes=surface.key.startsWith('lesson')?root.querySelectorAll('[data-token]'):root.querySelectorAll('[data-ink-block]');
  nodes.forEach(el=>{const r=el.getBoundingClientRect();if(r.width&&r.height)surface.anchors.set(el.dataset.token||el.dataset.inkBlock,{x:r.left-base.left,y:r.top-base.top,w:r.width,h:r.height})});
  const w=root.clientWidth,h=root.clientHeight;surface.svg.setAttribute('width',w);surface.svg.setAttribute('height',h);surface.svg.setAttribute('viewBox',`0 0 ${w} ${h}`);
 }
@@ -173,11 +186,11 @@ function finishGesture(cancel=false){
 }
 function beforeChange(){document.querySelectorAll('[data-ink-action="paint"]').forEach(b=>penPresses.get(b)?.cancel());finishGesture();closePanel();setMode('view');surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null}
 function refresh(){
- finishGesture();surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null;setupTools();
+ finishGesture();surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null;activateLesson(document.body.dataset.lesson==='lesson9'?'lesson9':'lesson8');setupTools();
  const dialog=document.getElementById('lesson-note'),root=dialog.open?dialog.querySelector('.note-paper'):document.querySelector('.continuous-board');
  if(!root){syncMode();return}
- const key=dialog.open?'note:'+dialog.dataset.note:'lesson8';
- if(key!=='lesson8')root.querySelectorAll('h1,h3,p,.takeaway,img,figcaption').forEach((el,i)=>el.dataset.inkBlock='b'+i);
+ const key=dialog.open?'note:'+dialog.dataset.note:book.lesson;
+ if(key.startsWith('note:'))root.querySelectorAll('h1,h3,p,.takeaway,img,figcaption').forEach((el,i)=>el.dataset.inkBlock='b'+i);
  const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('ink-layer');svg.setAttribute('aria-hidden','true');root.append(svg);surface={root,key,svg,anchors:new Map()};surface.light=createLightPen(root);
  svg.addEventListener('pointerdown',begin);svg.addEventListener('pointermove',move);svg.addEventListener('pointerup',e=>{if(gesture?.id===e.pointerId){move(e);finishGesture()}});svg.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)finishGesture(true)});svg.addEventListener('lostpointercapture',e=>{if(gesture?.id===e.pointerId)finishGesture()});
  const observer=new ResizeObserver(()=>{if(surface?.svg===svg)redraw()});observer.observe(root);surface.observer=observer;root.querySelectorAll('img').forEach(img=>img.addEventListener('load',()=>{if(surface?.svg===svg)redraw()},{once:true}));redraw();syncMode();
