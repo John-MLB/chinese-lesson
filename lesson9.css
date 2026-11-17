@@ -16,6 +16,12 @@
 .lesson9-board .cause{--study-fill:#fee1e8;--study-color:#ec4c83}
 .lesson9-cell .flow-char{font-size:85px}
 .lesson9-cell .learning-word{color:#005ead}
+.lesson9-cell button.flow-char{appearance:none;border:0;border-radius:0;padding:0;margin:0;background:transparent;font-family:inherit;font-weight:inherit;min-width:0;box-sizing:content-box;cursor:pointer;touch-action:manipulation}
+.lesson9-cell button.flow-char:hover{background:#d9edff80}
+.lesson9-cell button.flow-char:focus-visible{outline:3px solid #005ead;outline-offset:1px}
+.lesson9-board .lesson9-red-arrow{position:absolute;left:-27px;top:14px;z-index:3;display:flex;align-items:center;justify-content:center;width:34px;height:48px;min-height:0;padding:0;border:0;border-radius:4px;background:transparent;touch-action:manipulation}
+.lesson9-red-arrow svg{flex:none;width:30px;height:28px;fill:#f04435;filter:drop-shadow(0 0 1px white)}
+.lesson9-red-arrow:hover,.lesson9-red-arrow:focus-visible{background:#ffe7df;outline:2px solid #ee4936}
 .lesson9-cell.flow-number-slot{align-items:center}
 .lesson9-cell.flow-indent .flow-paragraph-label{right:-22px;top:0;font-size:25px;line-height:1.15}
 .lesson9-cell.flow-indent .inline-number{top:0}
@@ -25,6 +31,36 @@
 .country-picture{margin:0;min-width:0;min-height:0;display:flex;flex-direction:column;gap:4px}
 .country-picture svg{display:block;flex:1;min-height:0;width:100%;overflow:hidden}
 .country-picture figcaption{font-size:clamp(17px,1.3vw,29px);line-height:1.1;flex:none;text-align:center}
+.lesson9-board .lesson9-picture-link{display:flex;flex:1;min-height:0;min-width:0;padding:0;margin:0;border:0;border-radius:5px;background:transparent;overflow:hidden;touch-action:manipulation}
+.country-picture figcaption button{display:block;width:100%;padding:0;border:0;border-radius:0;font:inherit;line-height:inherit;color:inherit;background:transparent;text-align:center;touch-action:manipulation}
+.lesson9-picture-link:hover,.lesson9-picture-link:focus-visible{outline:3px solid #197c75;outline-offset:-3px}
+.country-picture figcaption button:hover{text-decoration:underline}
+#lesson-note.lesson9-note .note-content{overflow-y:scroll;scrollbar-gutter:stable;scrollbar-width:auto;scrollbar-color:#6c8b7d #eef1e8;touch-action:pan-y}
+#lesson-note.lesson9-note .note-content::-webkit-scrollbar{width:18px}
+#lesson-note.lesson9-note .note-content::-webkit-scrollbar-thumb{background:#6c8b7d;border:4px solid #eef1e8;border-radius:10px}
+#lesson-note.lesson9-note .note-content::-webkit-scrollbar-track{background:#eef1e8}
+.lesson9-note .note-paper{touch-action:pan-y}
+.lesson9-note .board{font-size:clamp(30px,2.7vw,70px);line-height:1.65}
+.lesson9-note .board h3{font-size:1em;color:var(--green);margin:1em 0 .35em}
+.lesson9-note .board p{margin:.55em 0}
+.lesson9-pronunciation{color:#005ead;letter-spacing:.05em}
+.lesson9-example>span{color:#a95b13}
+.lesson9-note-sources{margin-top:1.5em;font-size:clamp(18px,1.35vw,30px);line-height:1.6;border-top:1px solid #ccd9cc;padding-top:12px}
+.lesson9-note-sources summary{cursor:pointer;min-height:44px}
+.lesson9-note-sources a{color:#176d73;overflow-wrap:anywhere}
+.lesson9-note-picture{float:right;width:min(44%,540px);margin:0 0 24px 30px;break-inside:avoid}
+.lesson9-note-picture svg{display:block;width:100%;height:230px;max-height:30vh}
+.lesson9-note-picture figcaption{text-align:center;font-size:.65em;line-height:1.3}
+.lesson9-note .board::after{content:"";display:block;clear:both}
+.lesson9-glyph-list{display:grid;gap:14px}
+.lesson9-glyph-card{display:grid;grid-template-columns:minmax(160px,.45fr) 1fr;align-items:center;gap:24px;border-bottom:1px solid #d7dfd1;padding:12px 8px}
+.lesson9-glyph-card .lesson9-glyph{display:flex;flex-direction:column;align-items:center;line-height:1.15;margin:0;color:#005ead}
+.lesson9-glyph>span{font-size:clamp(76px,7vw,150px)}
+.lesson9-glyph small{font-size:.75em;margin-top:8px}
+.lesson9-glyph-card h3{margin:0!important}
+.lesson9-glyph-card p{font-size:.82em}
+.lesson9-return-hint{font-size:clamp(18px,1.3vw,30px);color:#65776b}
+@media(max-width:700px){.lesson9-note-picture{float:none;width:100%;margin:0 0 20px}.lesson9-glyph-card{grid-template-columns:100px 1fr;gap:12px}.lesson9-return-hint{font-size:15px}.lesson9-note .board{font-size:28px}}
 .country-picture.wide{grid-column:1/-1}
 .country-pictures.count-3:not(:has(.wide)) .country-picture:first-child{grid-row:1/3}
 [data-lesson-menu]{font-weight:700}

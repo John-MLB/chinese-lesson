@@ -46,3 +46,23 @@ assert.equal(storageKey('lesson8'),'chinese-lesson-ink-v1','preserve existing no
 assert.throws(()=>validate({...sample,surfaces:{lesson8:sample.surfaces.lesson9}}));
 assert.throws(()=>validate({...sample,surfaces:{'note:sentence':sample.surfaces.lesson9}}));
 console.log('PASS: textbook lines, blue words, ten labeled highlight ranges across pagination; image exclusions, two-character indent; lesson-specific notes');
+const {words,glyphs,pictureNotes,noteContent}=require('./lesson9.js');
+assert.equal(words.length,14);assert.equal(glyphs.length,10);
+assert(tokens.filter(t=>t.blue).every(t=>words.some(w=>w.id===t.word)),'every blue character opens a dictionary entry');
+assert.deepEqual(tokens.filter(t=>t.wordStart).map(t=>t.word),words.map(w=>w.id));
+assert.equal(tokens.filter(t=>t.glyph).length,10,'exactly ten textbook arrows, no duplicate on 逛逛');
+for(const g of glyphs)assert.equal(tokens.find(t=>t.glyph===g.id).char,g.target);
+const noteIds=[...words.map(w=>'word-'+w.id),...glyphs.map(g=>'glyph-'+g.id),...pictureNotes.flatMap((list,p)=>list.map((_,i)=>`picture-${p}-${i}`))];
+assert.equal(noteIds.length,38);
+for(const [p,c]of countries.entries())assert.equal(pictureNotes[p].length,c.pictures.length,'every textbook picture has a popup');
+for(const w of words){assert.equal(w.examples.length,2);assert(w.lookup.length>0);assert(noteContent('word-'+w.id).html.includes('https://www.moedict.tw/'))}
+for(const id of noteIds){
+ const content=noteContent(id);assert(content?.title&&content?.html.includes('<details'),'all explanations include their sources');
+ const saved={...sample,surfaces:{['note:l9-'+id]:[{tool:'pen',color:'#c43d32',width:3,points:[{a:'b0',x:.5,y:.5}]}]}};
+ assert.deepEqual(validate(JSON.parse(JSON.stringify(saved))),saved,'new popup notes survive saving and reopening');
+ assert.throws(()=>validate({...saved,lesson:'lesson8'}),'popup notes cannot cross lessons');
+}
+assert.equal(noteContent('picture-0-3'),null);
+assert.equal(noteContent('word-unknown'),null);
+assert.throws(()=>validate({...sample,surfaces:{'note:l9-word-unknown':[]}}));
+console.log('PASS: 14 word entries / 28 original examples, 14 picture introductions, 10 character groups; 38 popup note round-trips and cross-lesson rejection');

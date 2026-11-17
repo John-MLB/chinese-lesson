@@ -74,6 +74,59 @@ const countries=[
 ];
 const imageFiles=['lesson9-pages-94-95.png','lesson9-pages-96-97.png'];
 const numerals=['一','二','三','四'];
+// Teacher-facing explanations are bundled locally; opening one never leaves the lesson.
+const words=[
+ {id:'buddha',term:'佛',sound:'ㄈㄛˊ',lookup:['佛','佛陀'],meaning:'「佛陀」的簡稱。佛教用這個稱呼，指明白人生道理、解開煩惱的人。課文的「千佛之國」是形容泰國與佛教關係密切。',examples:['這座寺廟裡有一尊金色的佛像。','奶奶到寺廟禮佛時，我在一旁安靜等候。']},
+ {id:'thailand',term:'泰國',sound:'ㄊㄞˋ ㄍㄨㄛˊ',lookup:['泰國'],meaning:'位於東南亞的國家，在中南半島的中部。',examples:['叔叔從泰國旅行回來，帶了一包芒果乾給我。','我在地圖上找到泰國，也看了看它附近有哪些國家。']},
+ {id:'temple',term:'廟',sound:'ㄇㄧㄠˋ',lookup:['廟'],meaning:'供奉神明或佛像，讓人參拜的建築。',examples:['過年時，爸爸帶我們到附近的廟裡祈福。','這座廟的屋頂有許多精美的雕刻。']},
+ {id:'splendid',term:'華麗',sound:'ㄏㄨㄚˊ ㄌㄧˋ',lookup:['華麗'],meaning:'漂亮又有光彩，裝飾十分豐富。',examples:['演員穿著華麗的服裝，一走上舞臺就吸引了大家的目光。','這座宮殿有金色的大門和彩色的屋頂，看起來十分華麗。']},
+ {id:'monk',term:'和尚',sound:'ㄏㄜˊ ㄕㄤˋ',lookup:['和尚'],meaning:'日常生活中，常用來稱呼出家修行的男性佛教徒。',examples:['參觀寺廟時，一位和尚向我們介紹殿堂裡的佛像。','這位和尚說話很溫和，大家都專心聽他講解。']},
+ {id:'stroll',term:'逛逛',sound:'ㄍㄨㄤˋ ㄍㄨㄤˋ',lookup:['逛'],meaning:'悠閒地走走、看看。「逛逛水上市場」就是到市場裡走走，看看有哪些東西。',examples:['晚飯後，我和家人到夜市逛逛。','這家書店有好多新書，我想進去逛逛。']},
+ {id:'dealings',term:'往來',sound:'ㄨㄤˇ ㄌㄞˊ',lookup:['往來'],meaning:'有來有去，也可以指人與人之間的交往。課文的「生意往來」，是指買賣東西時的交易。',examples:['這家水果店和附近的果園一直有生意往來。','搬家以後，我們還是常和以前的鄰居往來。']},
+ {id:'egypt',term:'埃及',sound:'ㄞ ㄐㄧˊ',lookup:['埃及'],meaning:'主要位於非洲東北部的國家，還有一部分國土在亞洲的西奈半島。',examples:['我最想去埃及看看金字塔。','讀完介紹埃及的書，我對尼羅河更好奇了。']},
+ {id:'nile',term:'尼羅河',sound:'ㄋㄧˊ ㄌㄨㄛˊ ㄏㄜˊ',lookup:['尼羅河'],meaning:'非洲的一條大河，流經埃及，最後流入地中海。河水對沿岸居民的生活和耕種很重要。',examples:['老師請我們在地圖上找出尼羅河流經的地方。','讀了課文，我才知道尼羅河對埃及人這麼重要。']},
+ {id:'lowland',term:'地勢低窪',sound:'ㄉㄧˋ ㄕˋ ㄉㄧ ㄨㄚ',lookup:['地勢','低窪'],meaning:'「地勢」是地面高低起伏的樣子；「低窪」是比四周低。合起來就是土地的位置比較低，容易積水。',examples:['這一帶地勢低窪，下大雨時容易積水。','因為公園的一角地勢低窪，工人正在那裡改善排水。']},
+ {id:'dike',term:'築堤防潮',sound:'ㄓㄨˊ ㄊㄧˊ ㄈㄤˊ ㄔㄠˊ',lookup:['築','堤','防','潮'],meaning:'「築」是建造；「堤」是擋水的堤岸；「防」是防備；「潮」是潮水。合起來就是建造堤岸，防止潮水侵入。',examples:['海邊的居民築堤防潮，希望保護自己的家園。','這片土地比海面低，因此人們需要築堤防潮。']},
+ {id:'tulip',term:'鬱金香',sound:'ㄩˋ ㄐㄧㄣ ㄒㄧㄤ',lookup:['鬱金香'],meaning:'一種供人欣賞的開花植物。花朵像杯子，有紅、黃、白、紫等顏色，地下長著像小球的鱗莖。',examples:['花園裡的鬱金香開了，有紅色，也有黃色。','妹妹把鬱金香畫成一個個漂亮的小杯子。']},
+ {id:'atmosphere',term:'氣息',sound:'ㄑㄧˋ ㄒㄧˊ',lookup:['氣息'],meaning:'萌典收錄呼吸時進出的空氣、氣味等意思。在課文裡，「歡樂的氣息」是延伸用法，指讓人感到快樂的氣氛。',examples:['園遊會上到處都是笑聲，充滿歡樂的氣息。','教室掛起彩帶，立刻多了幾分過節的氣息。']},
+ {id:'rowing',term:'划船',sound:'ㄏㄨㄚˊ ㄔㄨㄢˊ',lookup:['划船'],meaning:'用槳撥動水，讓船前進。',examples:['爸爸教我划船，先示範怎麼握住船槳。','大家一起用力划船，小船慢慢靠近岸邊。']}
+];
+const glyphs=[
+ {id:'buddha',target:'佛',kind:'形近字',hint:'左邊換了部件，字義和讀音也會改變。',items:[['佛','ㄈㄛˊ','佛教','左邊是「亻」（人字旁）。'],['拂','ㄈㄨˊ','吹拂','左邊是「扌」（提手旁）。'],['沸','ㄈㄟˋ','沸騰','左邊是「氵」（三點水）。']]},
+ {id:'terrain',target:'勢',kind:'形近字',hint:'看清楚字的下半部。',items:[['勢','ㄕˋ','地勢','下面是「力」。'],['熱','ㄖㄜˋ','熱情','下面是「灬」（四點底）。']]},
+ {id:'prevent',target:'防',kind:'形近字',hint:'右邊都是「方」，要看左邊。',items:[['防','ㄈㄤˊ','防止','左邊是「阝」（左耳旁）。'],['妨','ㄈㄤˊ','妨礙','左邊是「女」。']]},
+ {id:'dike',target:'堤',kind:'形近字',hint:'都有「是」這個部件，搭配的另一部分不同。',items:[['堤','ㄊㄧˊ','河堤','左邊是「土」。'],['提','ㄊㄧˊ','提早','左邊是「扌」（提手旁）。'],['題','ㄊㄧˊ','題目','右邊是「頁」。']]},
+ {id:'row',target:'划',kind:'形近字',hint:'都有「戈」，留意另一個部件的位置。',items:[['划','ㄏㄨㄚˊ','划船','右邊是「刂」（立刀旁）。'],['伐','ㄈㄚ','步伐','左邊是「亻」（人字旁）。']]},
+ {id:'egypt',target:'埃',kind:'形近字',hint:'右邊都是「矣」，左邊的部件不同。',items:[['埃','ㄞ','埃及','左邊是「土」。'],['唉','ㄞ','唉唷','左邊是「口」。'],['挨','ㄞ','挨近','左邊是「扌」（提手旁）。']]},
+ {id:'thai',target:'泰',kind:'形近字',hint:'上半部很像，要特別看下面。',items:[['泰','ㄊㄞˋ','泰國','下面是「水」的變形。'],['秦','ㄑㄧㄣˊ','秦朝','下面是「禾」。'],['奉','ㄈㄥˋ','奉獻','下面是兩橫加一直，不要多寫撇、捺。'],['奏','ㄗㄡˋ','彈奏','下面是「天」。']]},
+ {id:'stroll',target:'逛',kind:'形近字',hint:'「逛」比「狂」多了走之旁。',items:[['逛','ㄍㄨㄤˋ','逛街','外面有「辶」（走之旁）。'],['狂','ㄎㄨㄤˊ','狂歡','左邊是「犭」，沒有走之旁。']]},
+ {id:'tide',target:'潮',kind:'形近字',hint:'「潮」「嘲」都含有「朝」，但左邊的部件不同。',items:[['潮','ㄔㄠˊ','潮汐','左邊是「氵」（三點水）。'],['朝','ㄔㄠˊ','朝廷','沒有另外加三點水或口字旁。'],['嘲','ㄔㄠˊ','嘲笑','左邊是「口」。']]},
+ {id:'hua',target:'華',kind:'多音字',hint:'同一個字，放在不同詞語裡，讀音可能不同。',items:[['華','ㄏㄨㄚˊ','華麗','這裡讀二聲，形容漂亮、有光彩。'],['華','ㄏㄨㄚˋ','華佗','作為這個姓氏時讀四聲。華佗是東漢時的一位名醫。']]}
+];
+const pictureNotes=[
+ [
+  {title:'泰國寺廟',paragraphs:['寺廟是佛教徒禮佛、誦經和學習佛法的地方。在泰國，寺廟也是許多人生活中的重要場所。不同寺廟的屋頂、佛像和裝飾，各有自己的特色。','參觀時要穿著整齊，輕聲說話。進入殿堂前，依照現場規定脫鞋，也要尊重正在參拜的人。'],sources:[['泰國觀光局','https://www.tatnews.org/2018/08/observing-temple-and-sacred-site-etiquette-while-in-thailand/']]},
+  {title:'泰國和尚',paragraphs:['圖中穿著橘色僧袍的人是佛教僧人，也就是課文說的和尚。他們學習佛教，也會誦經、靜坐。靜坐時，人們讓身體安定下來，練習觀察自己的心。','在泰國，有人會準備食物供養僧人，表達尊敬與分享。有些寺廟也會安排活動，讓人認識佛教和當地文化。'],sources:[['泰國觀光局','https://tourismthailand.my/home/religion']]},
+  {title:'水上市場',paragraphs:['水上市場裡，有些攤販把小船當作攤位，載著水果、蔬菜或食物來做生意。買東西的人可以沿著岸邊逛，也能在有些市場搭船遊覽。','這種市場讓我們看見水邊居民的生活：河道不只是風景，也是運送物品、與人往來的道路。不同市場的營業時間並不相同。'],sources:[['泰國觀光局','https://www.tourismthailand.org/Trip-Planner/Suggestion-Detail/2-days-1-night-recommended-route-in-samut-songkhram']]}
+ ],
+ [
+  {title:'獅身人面像與金字塔',paragraphs:['獅身人面像有獅子的身體和人的頭。古埃及人用這種形象表現國王的力量。巨大的石像，也讓我們看見古人的雕刻技術。','附近的金字塔是古埃及國王的陵墓，也就是安葬國王的地方。許多石塊堆疊成巨大的建築，留下了古埃及文明的重要線索。'],sources:[['埃及觀光與古蹟部','https://egymonuments.gov.eg/en/monuments/the-great-sphinx/'],['哈佛大學 Digital Giza','https://giza.fas.harvard.edu/gizaintro/']]},
+  {title:'尼羅河',paragraphs:['埃及許多地方雨水很少，尼羅河因此十分重要。人們把河水引到田裡種植作物，河水讓乾燥土地上的生活有了依靠。','在古代，尼羅河氾濫後留下肥沃的泥土，讓河岸適合耕種。因此，許多古埃及人住在河流附近，形成一個個村莊與城市。'],sources:[['大英博物館：尼羅河谷的農業','https://artsandculture.google.com/story/kAWxk-YaOyfgJw?hl=en']]},
+  {title:'埃及沙漠',paragraphs:['沙漠是雨水很少的地方，植物不容易生長。埃及的沙漠不全都是沙子：有起伏的沙丘，也有黑色岩石和形狀特別的白色岩石。','沙漠中有些地方能找到水源，形成綠洲。綠洲裡可以看到樹木和農作物。水源在哪裡，往往會影響人們住在哪裡。'],sources:[['埃及官方旅遊網站','https://www.experienceegypt.eg/en/city/31/oase-farafra']]},
+  {title:'埃及插圖：法老與駱駝',paragraphs:['這張插圖集合了幾種埃及印象，例如金字塔、法老和駱駝。「法老」是古埃及國王的稱呼。你能在圖裡找到哪些與課文有關的事物？','駱駝適合在乾燥地區行走，寬大的腳掌有助於在沙地移動，也能幫人載運物品。牠的駝峰儲存的是脂肪，並不是裝水的水壺。'],sources:[['萌典：法老','https://www.moedict.tw/法老'],['聖地牙哥動物園','https://animals.sandiegozoo.org/animals/camel']]}
+ ],
+ [
+  {title:'荷蘭風車與鬱金香',paragraphs:['荷蘭有些土地很低，古人利用風力帶動風車，把多餘的水抽走，讓土地可以居住或耕種。有些風車則用來磨穀物、鋸木頭，工作各不相同。','春天時，鬱金香田開出各種顏色的花，遠看像鋪上彩色地毯。風車與鬱金香，都是人們想到荷蘭時常會想到的景物。'],sources:[['荷蘭官方旅遊網站：風車','https://www.holland.com/global/tourism/experience/dutch-icons/windmills-in-the-netherlands'],['荷蘭官方旅遊網站：春天','https://www.holland.com/global/tourism/travel-essentials-1/interests/season/spring']]},
+  {title:'荷蘭木鞋',paragraphs:['木鞋是用木頭做成的傳統工作鞋，通常由一整塊木頭雕成。堅硬的鞋身能保護雙腳，適合在潮溼、泥濘的地方工作。','有些木鞋會畫上鮮豔花紋，成為旅客喜歡的紀念品。如今，部分農場或工廠工作者仍會穿木鞋，但不是每個荷蘭人每天都穿它。'],sources:[['英國雷丁博物館','https://collections.readingmuseum.org.uk/pdfs/G140A.pdf']]},
+  {title:'荷蘭傳統服飾',paragraphs:['圖中的帽子、裙子和圍裙，讓人想到荷蘭的傳統服飾。不同地方的帽子形狀、衣服花色可能不一樣，過去能從服裝看出一個人的家鄉。','傳統服飾也會隨著時代改變。今天，我們可以到博物館認識這些衣服，了解以前的生活；它們不是所有荷蘭人現在每天穿的服裝。'],sources:[['荷蘭弗里斯博物館','https://www.friesmuseum.nl/en/collection/icons/fries-kostuum-met-gouden-oorijzer']]}
+ ],
+ [
+  {title:'阿爾卑斯山',paragraphs:['阿爾卑斯山是一大片相連的山脈，不是只有一座山。奧地利有許多地方位在這片山區，可以看到高山、森林、草地和湖泊。','季節不同，山裡的活動也不同。夏天有人健行、觀察自然，冬天則有人到雪地滑雪。這些山林景色，也是奧地利吸引旅客的原因。'],sources:[['奧地利國家旅遊局','https://www.austria.info/en-us/inspiration/alps/']]},
+  {title:'莫札特',paragraphs:['莫札特是出生在薩爾斯堡的作曲家。作曲家就像音樂的作者，會把想到的旋律寫成樂譜，讓別人也能演奏。','莫札特很小就跟父親學音樂，也和姊姊一起到不同城市表演。他創作過許多音樂作品，包括歌劇《魔笛》。直到今天，人們仍然演奏、欣賞他的音樂。'],sources:[['國際莫札特基金會','https://mozarteum.at/en/wolfgang-amade-mozart']]},
+  {title:'多瑙河',paragraphs:['多瑙河是歐洲的重要河流，從德國出發，流經奧地利等國家，最後流入黑海。在奧地利，河流大致由西往東流，沿岸有城市、村莊與自然風景。','旅客可以搭船欣賞兩岸，也能沿著河岸騎腳踏車。看著地圖追蹤河流，會發現一條河可以把不同地方連在一起。'],sources:[['奧地利國家旅遊局','https://www.austria.info/en-us/regions/danube/']]},
+  {title:'滑雪',paragraphs:['插圖中的長板是滑雪板，細長的桿子是滑雪杖。奧地利有高山和雪地，滑雪是當地受歡迎的冬季活動之一。','滑雪時需要保持平衡，也要學習轉彎和停下來。選擇適合自己能力的雪道，戴好安全帽，並且注意前方與旁邊的人，才能安心享受雪地活動。'],sources:[['奧地利國家旅遊局','https://www.austria.info/en-us/inspiration/skiing-and-winter/']]}
+ ]
+];
 // Fixed textbook annotations, separate from the teacher's editable ink.
 const studyKinds={rhetoric:{label:'修辭　類疊'},cause:{label:'句型　因果'}};
 const studyMarks=[
@@ -99,8 +152,14 @@ function tokensForLesson(){
   tokens.push({type:'indent',p,number:1,id:`p${p}-l0-indent`});
   country.lines.forEach((line,l)=>{
    if(l){const mark=markAt(offset);tokens.push({type:'number',p,number:l+1,id:`p${p}-l${l}-number`,mark:mark&&mark===markAt(offset-1)?mark.id:null})}
-   let blue=false,c=0;
-   for(const char of line){if(char==='【'){blue=true;continue}if(char==='】'){blue=false;continue}const mark=markAt(offset++);tokens.push({type:'char',p,char,blue,id:`p${p}-l${l}-c${c++}`,mark:mark?mark.id:null})}
+   let blue=false,c=0,word=null,wordStart=false;
+   for(let i=0;i<line.length;i++){
+    const char=line[i];
+    if(char==='【'){blue=true;word=words.find(w=>w.term===line.slice(i+1,line.indexOf('】',i)));wordStart=true;continue}
+    if(char==='】'){blue=false;word=null;continue}
+    const mark=markAt(offset++),glyph=blue?glyphs.find(g=>g.target===char):null;
+    tokens.push({type:'char',p,char,blue,word:word?.id||null,wordStart:!!word&&wordStart,glyph:glyph&&!tokens.some(t=>t.glyph===glyph.id)?glyph.id:null,id:`p${p}-l${l}-c${c++}`,mark:mark?mark.id:null});wordStart=false;
+   }
   });
  });return tokens;
 }
@@ -155,9 +214,51 @@ function studyMarkup(page){
   return band+(s.label?`<span class="lesson9-study-label ${s.kind}" data-study-mark="${s.id}" style="right:${right-24}px;top:${labelTop}px">${studyKinds[s.kind].label}</span>`:'');
  }).join('');
 }
-function crop(picture){const id='crop-'+picture.src+'-'+picture.box[0];return `<svg viewBox="${picture.box.join(' ')}" role="img" aria-label="${picture.caption}" preserveAspectRatio="xMidYMid meet"><defs><clipPath id="${id}">${(picture.clips||[picture.box]).map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`).join('')}</clipPath></defs><image href="${imageFiles[picture.src]}" width="2048" height="1176" clip-path="url(#${id})"/></svg>`}
+function crop(picture,prefix='crop'){const id=prefix+'-'+picture.src+'-'+picture.box[0];return `<svg viewBox="${picture.box.join(' ')}" role="img" aria-label="${picture.caption}" preserveAspectRatio="xMidYMid meet"><defs><clipPath id="${id}">${(picture.clips||[picture.box]).map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`).join('')}</clipPath></defs><image href="${imageFiles[picture.src]}" width="2048" height="1176" clip-path="url(#${id})"/></svg>`}
 function gallery(p){
- const c=countries[p];return `<div class="country-gallery-title">${c.name}</div><div class="country-pictures count-${c.pictures.length}">${c.pictures.map((pic,i)=>`<figure class="country-picture ${pic.wide?'wide':''}" data-token="p${p}-image${i}">${crop(pic)}<figcaption>${pic.caption}</figcaption></figure>`).join('')}</div>`;
+ const c=countries[p];return `<div class="country-gallery-title">${c.name}</div><div class="country-pictures count-${c.pictures.length}">${c.pictures.map((pic,i)=>`<figure class="country-picture ${pic.wide?'wide':''}" data-token="p${p}-image${i}"><button class="lesson9-picture-link" data-lesson9-note="picture-${p}-${i}" aria-label="認識${pic.caption}" aria-haspopup="dialog">${crop(pic)}</button><figcaption><button data-lesson9-note="picture-${p}-${i}" aria-haspopup="dialog">${pic.caption}</button></figcaption></figure>`).join('')}</div>`;
+}
+const escapeHTML=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const moeSources=terms=>terms.map(t=>['萌典：'+t,'https://www.moedict.tw/'+t]);
+function sourceMarkup(sources,caption='資料來源（介紹已改寫）'){
+ return `<details class="lesson9-note-sources"><summary>${caption}</summary><ul>${sources.map(([label,url])=>`<li><a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a></li>`).join('')}</ul></details>`;
+}
+function noteContent(id){
+ if(id.startsWith('word-')){
+  const w=words.find(w=>id==='word-'+w.id);if(!w)return null;
+  return {category:'認識詞語',title:w.term,html:`<p class="lesson9-pronunciation">${w.sound}</p><h3>課文中的意思</h3><p class="takeaway">${w.meaning}</p><h3>一起讀例句</h3>${w.examples.map((s,i)=>`<p class="lesson9-example"><span>${i+1}.</span> ${s}</p>`).join('')}${sourceMarkup(moeSources(w.lookup),'字義查考：萌典；例句為自編')}`};
+ }
+ if(id.startsWith('glyph-')){
+  const g=glyphs.find(g=>id==='glyph-'+g.id);if(!g)return null;
+  return {category:g.kind,title:g.kind==='多音字'?g.target:g.items.map(i=>i[0]).join('・'),html:`<p class="takeaway">${g.hint}</p><div class="lesson9-glyph-list">${g.items.map(([char,sound,word,hint])=>`<section class="lesson9-glyph-card"><p class="lesson9-glyph"><span>${char}</span><small>${sound}</small></p><div><h3>${word}</h3><p>${hint}</p></div></section>`).join('')}</div>${sourceMarkup(moeSources([...new Set(g.items.map(i=>i[0]))]),'字表依課本；讀音查考：萌典')}`};
+ }
+ const match=/^picture-([0-3])-([0-3])$/.exec(id);
+ if(match){const p=Number(match[1]),i=Number(match[2]),n=pictureNotes[p][i];if(!n)return null;
+  return {category:'看圖認識世界',title:n.title,html:`<figure class="lesson9-note-picture">${crop(countries[p].pictures[i],'note-crop')}<figcaption>${countries[p].pictures[i].caption}</figcaption></figure>${n.paragraphs.map(s=>`<p>${s}</p>`).join('')}${sourceMarkup(n.sources)}`};
+ }
+ return null;
+}
+let noteOpener=null;
+function closeLessonNote(){
+ const dialog=document.getElementById('lesson-note');if(!dialog.dataset.lesson9Note)return;
+ lessonInk.beforeChange();dialog.close();dialog.classList.remove('lesson9-note');delete dialog.dataset.lesson9Note;
+ lessonInk.refresh();if(noteOpener?.isConnected)noteOpener.focus({preventScroll:true});noteOpener=null;
+}
+function openLessonNote(id,opener){
+ const content=noteContent(id);if(!content)return;
+ const dialog=document.getElementById('lesson-note');lessonInk.beforeChange();noteOpener=opener;
+ dialog.dataset.note='l9-'+id;dialog.dataset.lesson9Note=id;dialog.classList.add('lesson9-note');
+ const close=side=>`<div class="note-controls note-controls-${side}"><button class="note-close" data-lesson9-close aria-label="${side==='left'?'左':'右'}側關閉解說，返回課文" title="關閉解說，返回課文"><span aria-hidden="true">×</span></button></div>`;
+ dialog.innerHTML=`<div class="note-header"><p>老師補充</p></div><div class="note-middle"><nav class="note-tools" data-ink-side="left" aria-label="解說左側畫筆工具"></nav><div class="note-content" tabindex="0" role="region" aria-label="解說內容，可上下捲動"><div class="note-paper"><p class="kicker">${content.category}</p><h1 id="note-title">${content.title}</h1><div class="board">${content.html}</div></div></div><nav class="note-tools" data-ink-side="right" aria-label="解說右側畫筆工具"></nav></div><div class="note-footer">${close('left')}<span class="lesson9-return-hint">關閉後，回到原來的課文</span>${close('right')}</div>`;
+ dialog.querySelectorAll('[data-lesson9-close]').forEach(b=>b.onclick=closeLessonNote);
+ if(!dialog.open)dialog.showModal();dialog.querySelector('.note-content').scrollTop=0;lessonInk.refresh();
+ dialog.querySelector('[data-lesson9-close]').focus({preventScroll:true});
+}
+// Capture only our dialogs; Lesson 8 keeps its existing history-based modal flow.
+if(typeof document!=='undefined'){
+ const dialog=document.getElementById('lesson-note');
+ dialog?.addEventListener('cancel',event=>{if(dialog.dataset.lesson9Note){event.preventDefault();event.stopImmediatePropagation();closeLessonNote()}},true);
+ dialog?.addEventListener('close',()=>{if(!dialog.open){dialog.classList.remove('lesson9-note');delete dialog.dataset.lesson9Note;noteOpener=null}});
 }
 function catalogue(){return `<section class="lesson9-catalogue"><p class="kicker">第三單元・第九課</p><h1>請到我的家鄉來</h1><div class="lesson9-menu">${sections.map((s,i)=>`<a class="card ${s.ready?'current':''}" href="#lesson9-${s.id}${s.ready?'-1':''}"><span class="lesson9-card-icon" aria-hidden="true">${s.icon}</span><span class="number">0${i+1}</span><h2>${s.title}</h2><p>${s.description}${s.ready?' →':''}</p></a>`).join('')}</div></section>`}
 function placeholder(id){const s=sections.find(s=>s.id===id);return s?`<p class="kicker">第九課・請到我的家鄉來</p><h1>${s.title}</h1><div class="empty"><p>這個部分準備中。</p></div><a class="button" href="#lesson9">回第九課目錄</a>`:catalogue()}
@@ -171,7 +272,12 @@ function layout(anchor){
  const index=anchored>=0?anchored:Math.max(0,Math.min(requested,pages.length-1)),page=pages[index];
  board.innerHTML=studyMarkup(page)+page.cells.map(t=>{
   const style=`right:${24+t.col*page.pitch}px;top:${10+t.row*page.rowHeight}px;width:${FONT*1.12}px;height:${page.rowHeight*t.span}px`;
-  if(t.type==='char')return `<span class="lesson9-cell flow-cell" style="${style}" data-token="${t.id}"><span class="flow-char ${t.blue?'learning-word':''}">${t.char}</span></span>`;
+  if(t.type==='char'){
+   const w=words.find(w=>w.id===t.word),g=glyphs.find(g=>g.id===t.glyph);
+   const char=w?`<button class="flow-char learning-word" data-lesson9-note="word-${w.id}" aria-label="${w.term}：字義與例句" aria-haspopup="dialog" ${t.wordStart?'':'tabindex="-1"'}>${t.char}</button>`:`<span class="flow-char">${t.char}</span>`;
+   const arrow=g?`<button class="lesson9-red-arrow" data-lesson9-note="glyph-${g.id}" aria-label="${g.target}：${g.kind}" aria-haspopup="dialog" title="${g.target}：${g.kind}"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M2 10h15V3l13 11-13 11v-7H2z"/></svg></button>`:'';
+   return `<span class="lesson9-cell flow-cell" style="${style}" data-token="${t.id}">${char}${arrow}</span>`;
+  }
   return `<span class="lesson9-cell ${t.type==='indent'?'flow-indent':'flow-number-slot'}" data-token="${t.id}" style="${style}" ${t.type==='indent'?'aria-label="段首空兩個全型字"':''}><span class="inline-number" aria-label="課本第${t.number}行">${t.number}</span>${t.type==='indent'?`<span class="flow-paragraph-label">第${numerals[t.p]}段</span>`:''}</span>`;
  }).join('');
  if(page.picture!==null){
@@ -179,6 +285,7 @@ function layout(anchor){
   figure.style.cssText=`left:12px;bottom:10px;width:${page.pictureCols*page.pitch-18}px;height:${page.pictureRows*page.rowHeight-14}px`;
   figure.innerHTML=gallery(page.picture);board.append(figure);
  }
+ board.onclick=event=>{const button=event.target.closest('[data-lesson9-note]');if(button)openLessonNote(button.dataset.lesson9Note,button)};
  document.getElementById('reading-count').textContent=`${index+1} / ${pages.length}`;
  for(const suffix of ['', '-right']){
   const prev=document.getElementById('reading-prev'+suffix),next=document.getElementById('reading-next'+suffix);
@@ -188,6 +295,6 @@ function layout(anchor){
  if(anchor)history.replaceState(history.state,'','#lesson9-text-'+(index+1));
  lessonInk.refresh();return index+1;
 }
-const api={sections,countries,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
+const api={sections,countries,words,glyphs,pictureNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else window.lesson9=api;
 })();

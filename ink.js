@@ -5,6 +5,11 @@ const STORAGE='chinese-lesson-ink-v1', COLORS=['#c43d32','#195fc0','#182b29','#2
 const HIGHLIGHT_COLORS=['#ffe34d','#ff8fbd','#6cc9f4','#80dc84'];
 const strokeWidth=s=>s.tool==='highlight'?({3:22,6:34,10:48})[s.width]:s.width;
 const NOTE_IDS=['sentence','definition','idiom','examples','giraffe','benefits','meaning','excerpt'];
+const NOTE9_IDS=[
+ ...['buddha','thailand','temple','splendid','monk','stroll','dealings','egypt','nile','lowland','dike','tulip','atmosphere','rowing'].map(id=>'l9-word-'+id),
+ ...['buddha','terrain','prevent','dike','row','egypt','thai','stroll','tide','hua'].map(id=>'l9-glyph-'+id),
+ ...[3,4,3,4].flatMap((count,p)=>Array.from({length:count},(_,i)=>`l9-picture-${p}-${i}`))
+];
 const MAX_POINTS=150000, MAX_BYTES=12*1024*1024;
 const clone=value=>JSON.parse(JSON.stringify(value));
 const emptyBook=lesson=>({format:'chinese-lesson-notes',version:1,lesson,surfaces:{}});
@@ -17,7 +22,7 @@ function validate(raw){
  if(!raw||raw.format!=='chinese-lesson-notes'||raw.version!==1||!['lesson8','lesson9'].includes(raw.lesson)||!raw.surfaces||typeof raw.surfaces!=='object'||Array.isArray(raw.surfaces))throw Error('這不是本站的課堂筆記檔。');
  const clean={format:raw.format,version:1,lesson:raw.lesson,surfaces:{}};let count=0,total=0;
  for(const [key,strokes] of Object.entries(raw.surfaces)){
-  if(key!==raw.lesson&&!(raw.lesson==='lesson8'&&NOTE_IDS.includes(key.replace(/^note:/,''))))throw Error('筆記頁面名稱不正確。');
+  if(key!==raw.lesson&&!(raw.lesson==='lesson8'?NOTE_IDS:NOTE9_IDS).includes(key.replace(/^note:/,'')))throw Error('筆記頁面名稱不正確。');
   if(key!==raw.lesson&&!key.startsWith('note:'))throw Error('筆記頁面名稱不正確。');
   if(!Array.isArray(strokes)||(total+=strokes.length)>5000)throw Error('筆記筆數太多。');
   clean.surfaces[key]=strokes.map(s=>{
