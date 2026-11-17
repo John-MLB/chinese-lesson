@@ -55,3 +55,17 @@ function lightFixture(){
  f.enable(true);f.events.pointerdown(f.e());f.handle.destroy();assert.deepEqual(f.counts(),[4,0,4]);assert.equal(Object.keys(f.events).length,0);
 }
 console.log('PASS: light contact/release, drag, control exclusion, drawing exclusion and cancellation cleanup');
+
+const {strokeWidth}=require('./ink.js');
+const marked=mutate(v=>v.surfaces.lesson8.push({tool:'highlight',color:'#ffe34d',width:6,points:[{a:'p0-l0-c0',x:0,y:.5},{a:'p0-l0-c1',x:1,y:.5}]}));
+assert.deepEqual(validate(JSON.parse(JSON.stringify(marked))),marked);
+for(const color of ['#ffe34d','#ff8fbd','#6cc9f4','#80dc84']){
+ const v=structuredClone(marked);v.surfaces.lesson8[1].color=color;assert.deepEqual(validate(v),v);
+}
+assert.throws(()=>validate(mutate(v=>v.surfaces.lesson8[0].tool='unknown')));
+assert.throws(()=>validate(mutate(v=>v.surfaces.lesson8[0].color='#ffe34d')));
+assert.throws(()=>validate({...marked,surfaces:{lesson8:[{...marked.surfaces.lesson8[1],width:999}]}}));
+assert.deepEqual([3,6,10].map(width=>strokeWidth({tool:'highlight',width})),[22,34,48]);
+assert.equal(strokeWidth({tool:'pen',width:3}),3);
+assert.equal(strokeWidth({tool:'line',width:10}),10);
+console.log('PASS: old/new note format round-trip, highlight colors and width limits');

@@ -48,3 +48,7 @@
 .continuous-board,.note-paper{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .light-pen-layer{position:absolute;left:0;top:0;z-index:5;pointer-events:none}
 .light-pen-held,.light-pen-held *{cursor:none!important}
+
+/* Transparent marker strokes stay readable over lesson text. */
+.ink-layer path.ink-highlight{opacity:.32;mix-blend-mode:multiply;stroke-linecap:butt}
+.ink-panel .ink-wide{grid-column:1 / -1}

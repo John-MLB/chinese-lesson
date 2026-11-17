@@ -2,6 +2,8 @@
 (() => {
 'use strict';
 const STORAGE='chinese-lesson-ink-v1', COLORS=['#c43d32','#195fc0','#182b29','#23844d'];
+const HIGHLIGHT_COLORS=['#ffe34d','#ff8fbd','#6cc9f4','#80dc84'];
+const strokeWidth=s=>s.tool==='highlight'?({3:22,6:34,10:48})[s.width]:s.width;
 const NOTE_IDS=['sentence','definition','idiom','examples','giraffe','benefits','meaning','excerpt'];
 const MAX_POINTS=150000, MAX_BYTES=12*1024*1024;
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -16,7 +18,7 @@ function validate(raw){
   if(key!=='lesson8'&&!key.startsWith('note:'))throw Error('筆記頁面名稱不正確。');
   if(!Array.isArray(strokes)||(total+=strokes.length)>5000)throw Error('筆記筆數太多。');
   clean.surfaces[key]=strokes.map(s=>{
-   if(!s||!COLORS.includes(s.color)||![3,6,10].includes(s.width)||!['pen','line'].includes(s.tool)||!Array.isArray(s.points)||s.points.length<1||s.points.length>12000)throw Error('筆跡資料不完整。');
+   if(!s||!(s.tool==='highlight'?HIGHLIGHT_COLORS:COLORS).includes(s.color)||![3,6,10].includes(s.width)||!['pen','line','highlight'].includes(s.tool)||!Array.isArray(s.points)||s.points.length<1||s.points.length>12000)throw Error('筆跡資料不完整。');
    count+=s.points.length;if(count>MAX_POINTS)throw Error('筆記太大，請分成不同檔案保存。');
    const points=s.points.map(p=>{
     const pattern=key==='lesson8'?/^p[0-4]-l\d{1,2}-c\d{1,3}$/:/^b\d{1,3}$/;
@@ -55,7 +57,7 @@ function bindLightPen(root,{allowed,show,move,hide}){
  return {stop,destroy(){stop();for(const [name,fn]of Object.entries(events))root.removeEventListener(name,fn)}};
 }
 // Pure helpers are shared by the browser and the small regression check.
-if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance,bindPenPress,bindLightPen};return}
+if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance,bindPenPress,bindLightPen,strokeWidth};return}
 try{const saved=localStorage.getItem(STORAGE);if(saved)book=validate(JSON.parse(saved))}catch{localProblem=true}
 function saveLocal(){clearTimeout(saveTimer);try{localStorage.setItem(STORAGE,JSON.stringify(book));localProblem=false;return true}catch{localProblem=true;toast('這台電腦暫時無法自動保存，請按「存檔」下載筆記檔。');return false}}
 function remember(before){past.push(before);if(past.length>25)past.shift();future=[];saveTimer=setTimeout(saveLocal,300);updatePanel();}
@@ -66,9 +68,9 @@ function setMode(next){finishGesture();mode=next;closePanel();syncMode()}
 function syncMode(){
  surface?.light?.stop();
  document.querySelectorAll('.ink-layer').forEach(el=>{el.classList.toggle('ink-active',mode!=='view'&&el===surface?.svg);el.classList.toggle('ink-erase',mode==='eraser')});
- document.querySelectorAll('[data-ink-action]').forEach(b=>{const selected=(b.dataset.inkAction==='erase'&&mode==='eraser')||(b.dataset.inkAction==='paint'&&['pen','line'].includes(mode));b.classList.toggle('ink-selected',selected);if(['paint','erase'].includes(b.dataset.inkAction))b.setAttribute('aria-pressed',String(selected));else b.removeAttribute('aria-pressed')});
+ document.querySelectorAll('[data-ink-action]').forEach(b=>{const selected=(b.dataset.inkAction==='erase'&&mode==='eraser')||(b.dataset.inkAction==='paint'&&['pen','line','highlight'].includes(mode));b.classList.toggle('ink-selected',selected);if(['paint','erase'].includes(b.dataset.inkAction))b.setAttribute('aria-pressed',String(selected));else b.removeAttribute('aria-pressed')});
  document.querySelectorAll('.ink-mode-banner').forEach(e=>e.remove());
- if(mode!=='view'&&surface){const b=document.createElement('button');b.className='ink-mode-banner';b.textContent=({pen:'手繪',line:'直線',eraser:'橡皮擦'}[mode])+'中・完成書寫';b.onclick=()=>setMode('view');host().append(b)}
+ if(mode!=='view'&&surface){const b=document.createElement('button');b.className='ink-mode-banner';b.textContent=({pen:'手繪',line:'直線',highlight:'螢光筆',eraser:'橡皮擦'}[mode])+'中・完成書寫';b.onclick=()=>setMode('view');host().append(b)}
 }
 function toolMarkup(){return `<button class="rail-control" data-ink-action="paint" aria-label="畫筆：輕點切換，長按設定" title="輕點：書寫／光筆；長按：畫筆設定"><span class="ink-tool-symbol" aria-hidden="true">✎</span><span>畫筆</span></button><button class="rail-control" data-ink-action="erase" aria-label="橡皮擦（擦除整筆）"><span class="ink-tool-symbol" aria-hidden="true">▱</span><span>橡皮擦</span></button><button class="rail-control" data-ink-action="undo" data-history="undo" aria-label="上一步：復原筆跡" title="上一步：復原筆跡"><span class="ink-tool-symbol" aria-hidden="true">↶</span><span>上一步</span></button><button class="rail-control" data-ink-action="redo" data-history="redo" aria-label="下一步：重做筆跡" title="下一步：重做筆跡"><span class="ink-tool-symbol" aria-hidden="true">↷</span><span>下一步</span></button><button class="rail-control" data-ink-action="save" aria-label="儲存與開啟筆記"><span class="ink-tool-symbol" aria-hidden="true">▣</span><span>存檔</span></button>`}
 const penPresses=new WeakMap();
@@ -78,7 +80,7 @@ function setupTools(){
  document.querySelectorAll('[data-ink-action]').forEach(b=>{
   const action=b.dataset.inkAction;
   if(action==='paint'){
-   if(!penPresses.has(b))penPresses.set(b,bindPenPress(b,()=>{if(['pen','line'].includes(mode))setMode('view');else{color=COLORS[0];width=3;setMode('pen')}},()=>{if(!['pen','line'].includes(mode))setMode('pen');openPanel('paint',b.closest('[data-ink-side]').dataset.inkSide)}));
+   if(!penPresses.has(b))penPresses.set(b,bindPenPress(b,()=>{if(['pen','line','highlight'].includes(mode))setMode('view');else{color=COLORS[0];width=3;setMode('pen')}},()=>{if(!['pen','line','highlight'].includes(mode)){color=COLORS[0];width=3;setMode('pen')}openPanel('paint',b.closest('[data-ink-side]').dataset.inkSide)}));
   }else b.onclick=()=>{if(action==='erase')setMode(mode==='eraser'?'view':'eraser');else if(action==='undo'||action==='redo')undoRedo(action==='redo');else openPanel(action,b.closest('[data-ink-side]').dataset.inkSide)};
  });
  updatePanel();
@@ -89,18 +91,17 @@ function openPanel(kind,side){
  const h=document.createElement('h2');h.textContent=kind==='paint'?'畫筆工具':'我的課堂筆記';el.append(h);
  if(kind==='paint'){
   const grid=document.createElement('div');grid.className='ink-grid';
-  [['光筆','view'],['手繪','pen'],['直線','line'],['橡皮擦','eraser']].forEach(([label,value])=>{const b=button(label,()=>setMode(value));b.classList.toggle('primary',mode===value);grid.append(b)});el.append(grid);
-  const colors=document.createElement('div');colors.className='ink-colors';COLORS.forEach((c,i)=>{const b=button('',()=>{color=c;openPanel('paint',side)});b.setAttribute('aria-label',['紅色','藍色','黑色','綠色'][i]);b.setAttribute('aria-pressed',String(color===c));b.classList.toggle('ink-selected',color===c);const dot=document.createElement('span');dot.className='ink-swatch';dot.style.background=c;b.append(dot);colors.append(b)});el.append(colors);
+  [['手繪','pen'],['直線','line'],['螢光筆','highlight']].forEach(([label,value])=>{const b=button(label,()=>{if(value==='highlight'&&mode!=='highlight'){color=HIGHLIGHT_COLORS[0];width=6}else if(value!=='highlight'&&mode==='highlight'){color=COLORS[0];width=3}setMode(value);openPanel('paint',side)});b.classList.toggle('primary',mode===value);if(value==='highlight')b.classList.add('ink-wide');grid.append(b)});el.append(grid);
+  const colors=document.createElement('div');colors.className='ink-colors';(mode==='highlight'?HIGHLIGHT_COLORS:COLORS).forEach((c,i)=>{const b=button('',()=>{color=c;openPanel('paint',side)});b.setAttribute('aria-label',(mode==='highlight'?['黃色','粉紅色','淺藍色','淺綠色']:['紅色','藍色','黑色','綠色'])[i]);b.setAttribute('aria-pressed',String(color===c));b.classList.toggle('ink-selected',color===c);const dot=document.createElement('span');dot.className='ink-swatch';dot.style.background=c;b.append(dot);colors.append(b)});el.append(colors);
   const sizes=document.createElement('div');sizes.className='ink-grid';[3,6,10].forEach((n,i)=>{const b=button(['細筆','中筆','粗筆'][i],()=>{width=n;openPanel('paint',side)});b.classList.toggle('primary',width===n);sizes.append(b)});el.append(sizes);
-  const history=document.createElement('div');history.className='ink-grid';const undo=button('上一步',()=>undoRedo(false));undo.dataset.history='undo';const redo=button('下一步',()=>undoRedo(true));redo.dataset.history='redo';history.append(undo,redo);el.append(history);
-  const hint=document.createElement('p');hint.textContent='輕點畫筆：書寫／光筆。長按畫筆：開啟設定。光筆按住發光、拖曳留淡影，放開即消失，不會存成筆跡。';el.append(hint);
+  const hint=document.createElement('p');hint.textContent='選好後直接在課文上畫。輕點側邊畫筆，回到光筆。';el.append(hint);
  }else{
   const hint=document.createElement('p');hint.textContent='筆跡會自動記在這台電腦的此瀏覽器。請另存筆記檔，以免清除瀏覽器資料後遺失。';el.append(hint);
   [['下載筆記到本機',download],['存到同步資料夾',saveFolder],['開啟筆記檔',importFile]].forEach(([label,action])=>{const b=button(label,action);b.className='ink-full';el.append(b)});
   const cloud=document.createElement('p');cloud.textContent='同步資料夾：選電腦上的 Google Drive 或 OneDrive 資料夾；雲端上傳由該同步程式處理。';el.append(cloud);
   const status=document.createElement('p');status.className='ink-status';status.setAttribute('role','status');status.textContent=localProblem?'自動保存未成功，請下載筆記檔。':'可開啟筆記檔，繼續書寫。';el.append(status);
  }
- const close=button('關閉工具',closePanel);close.className='ink-full';el.append(close);host().append(el);updatePanel();
+ if(kind!=='paint'){const close=button('關閉工具',closePanel);close.className='ink-full';el.append(close)}host().append(el);updatePanel();
 }
 function updatePanel(){document.querySelectorAll('[data-history]').forEach(b=>b.disabled=!(b.dataset.history==='undo'?past.length:future.length))}
 function undoRedo(redo){finishGesture();const from=redo?future:past,to=redo?past:future;if(!from.length)return;to.push(clone(book));book=from.pop();saveLocal();redraw();updatePanel()}
@@ -141,12 +142,13 @@ function resolve(p){const r=surface.anchors.get(p.a);return r?{x:r.x+p.x*r.w,y:r
 function pathData(points){let d='',prev=null;for(const point of points){const p=resolve(point);if(!p){prev=null;continue}const gap=prev&&Math.hypot(p.x-prev.x,p.y-prev.y)>240;d+=(prev&&!gap?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1);if(!prev||gap)d+='l.1 .1';prev=p}return d}
 function redraw(){
  if(!surface?.svg.isConnected)return;geometry();const strokes=book.surfaces[surface.key]||[];surface.svg.replaceChildren();
- for(const s of [...strokes,...(gesture?.stroke?[gesture.stroke]:[])]){const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',pathData(s.points));path.setAttribute('stroke',s.color);path.setAttribute('stroke-width',s.width);surface.svg.append(path)}
+ const ordered=[...strokes,...(gesture?.stroke?[gesture.stroke]:[])].sort((a,b)=>Number(b.tool==='highlight')-Number(a.tool==='highlight'));
+ for(const s of ordered){const path=document.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',pathData(s.points));path.setAttribute('stroke',s.color);path.setAttribute('stroke-width',strokeWidth(s));if(s.tool==='highlight')path.classList.add('ink-highlight');surface.svg.append(path)}
 }
 function localPoint(e){const r=surface.root.getBoundingClientRect();return{x:e.clientX-r.left,y:e.clientY-r.top}}
 function erase(point){
  const list=book.surfaces[surface.key]||[];book.surfaces[surface.key]=list.filter(s=>{
-  let prev=null;for(const p of s.points){const here=resolve(p);if(here){if(Math.hypot(here.x-point.x,here.y-point.y)<14+s.width/2)return false;if(prev&&Math.hypot(here.x-prev.x,here.y-prev.y)<240&&pointDistance(point,prev,here)<14+s.width/2)return false}prev=here}return true
+  let prev=null;for(const p of s.points){const here=resolve(p);if(here){if(Math.hypot(here.x-point.x,here.y-point.y)<14+strokeWidth(s)/2)return false;if(prev&&Math.hypot(here.x-prev.x,here.y-prev.y)<240&&pointDistance(point,prev,here)<14+strokeWidth(s)/2)return false}prev=here}return true
  });redraw();
 }
 function begin(e){
