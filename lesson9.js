@@ -16,7 +16,7 @@ const countries=[
   '每一座都【華麗】清靜。每一個信奉佛教的男',
   '人，都要出家當【和尚】一段時間，連國王也',
   '是如此。到了泰國，一定要【逛逛】水上市',
-  '場。市場的生意往來從清晨五點就開始，',
+  '場。市場的生意【往來】從清晨五點就開始，',
   '幾百條小船載著日用品、水果等，一片熱',
   '鬧景象。來吧，請到我的家鄉來！'
  ],pictures:[
@@ -61,7 +61,7 @@ const countries=[
   '有名的音樂家，都曾經在這裡居',
   '住過。這裡的男女老少都喜愛音',
   '樂，國土雖然不大，卻充滿歡樂',
-  '的氣息。每年到了音樂節，常有',
+  '的【氣息】。每年到了音樂節，常有',
   '大量的外國觀光客前來，在河上',
   '【划船】，在山上滑雪。來吧，請到',
   '我的家鄉來！'
@@ -74,15 +74,33 @@ const countries=[
 ];
 const imageFiles=['lesson9-pages-94-95.png','lesson9-pages-96-97.png'];
 const numerals=['一','二','三','四'];
+// Fixed textbook annotations, separate from the teacher's editable ink.
+const studyKinds={rhetoric:{label:'修辭　類疊'},cause:{label:'句型　因果'}};
+const studyMarks=[
+ {id:'thai-opening',p:0,kind:'rhetoric',text:'請到我的家鄉來，我的家鄉是「千佛之國」的泰國。'},
+ {id:'thai-ending',p:0,kind:'rhetoric',text:'來吧，請到我的家鄉來！'},
+ {id:'egypt-opening',p:1,kind:'rhetoric',text:'請到我的家鄉來，我的家鄉是五千年古國埃及。'},
+ {id:'egypt-climate',p:1,kind:'rhetoric',text:'氣候又乾又熱'},
+ {id:'egypt-ending',p:1,kind:'rhetoric',text:'來吧，請到我的家鄉來！'},
+ {id:'dutch-opening',p:2,kind:'rhetoric',text:'請到我的家鄉來，我的家鄉是地勢低窪的荷蘭。'},
+ {id:'dutch-cause',p:2,kind:'cause',text:'這裡的國土有三分之一在海平面之下，所以要築堤防潮，風車就是當初為了排水出海而建造的。'},
+ {id:'dutch-ending',p:2,kind:'rhetoric',text:'來吧，請到我的家鄉來！'},
+ {id:'austrian-opening',p:3,kind:'rhetoric',text:'請到我的家鄉來，我的家鄉是音樂國度奧地利，'},
+ {id:'austrian-ending',p:3,kind:'rhetoric',text:'來吧，請到我的家鄉來！'}
+];
 function tokensForLesson(){
  const tokens=[];
  countries.forEach((country,p)=>{
+  const plain=country.lines.join('').replace(/[【】]/g,'');
+  const ranges=studyMarks.filter(m=>m.p===p).map(m=>({...m,start:plain.indexOf(m.text)}));
+  let offset=0;
+  const markAt=i=>ranges.find(m=>i>=m.start&&i<m.start+m.text.length);
   tokens.push({type:'start',p});
   tokens.push({type:'indent',p,number:1,id:`p${p}-l0-indent`});
   country.lines.forEach((line,l)=>{
-   if(l)tokens.push({type:'number',p,number:l+1,id:`p${p}-l${l}-number`});
+   if(l){const mark=markAt(offset);tokens.push({type:'number',p,number:l+1,id:`p${p}-l${l}-number`,mark:mark&&mark===markAt(offset-1)?mark.id:null})}
    let blue=false,c=0;
-   for(const char of line){if(char==='【'){blue=true;continue}if(char==='】'){blue=false;continue}tokens.push({type:'char',p,char,blue,id:`p${p}-l${l}-c${c++}`})}
+   for(const char of line){if(char==='【'){blue=true;continue}if(char==='】'){blue=false;continue}const mark=markAt(offset++);tokens.push({type:'char',p,char,blue,id:`p${p}-l${l}-c${c++}`,mark:mark?mark.id:null})}
   });
  });return tokens;
 }
@@ -116,6 +134,27 @@ function paginate(width,height){
  }
  return pages;
 }
+// Split a marked passage only at actual columns/page breaks. No tokens are added,
+// so existing pagination and saved pen anchors retain their original positions.
+function studySegments(page){
+ const segments=[];
+ for(const cell of page.cells){
+  if(!cell.mark)continue;
+  const last=segments[segments.length-1];
+  if(last&&last.id===cell.mark&&last.col===cell.col&&last.row+last.span===cell.row)last.span+=cell.span;
+  else segments.push({id:cell.mark,col:cell.col,row:cell.row,span:cell.span});
+ }
+ const seen=new Set();
+ return segments.map(s=>{const mark=studyMarks.find(m=>m.id===s.id),label=!seen.has(s.id);seen.add(s.id);return {...s,kind:mark.kind,label}});
+}
+function studyMarkup(page){
+ return studySegments(page).map(s=>{
+  const right=24+s.col*page.pitch,top=10+s.row*page.rowHeight;
+  const band=`<span class="lesson9-study-band ${s.kind}" aria-hidden="true" style="right:${right}px;top:${top}px;width:${FONT*1.12}px;height:${s.span*page.rowHeight}px"></span>`;
+  const labelTop=Math.min(top,10+page.rows*page.rowHeight-134);
+  return band+(s.label?`<span class="lesson9-study-label ${s.kind}" data-study-mark="${s.id}" style="right:${right-24}px;top:${labelTop}px">${studyKinds[s.kind].label}</span>`:'');
+ }).join('');
+}
 function crop(picture){const id='crop-'+picture.src+'-'+picture.box[0];return `<svg viewBox="${picture.box.join(' ')}" role="img" aria-label="${picture.caption}" preserveAspectRatio="xMidYMid meet"><defs><clipPath id="${id}">${(picture.clips||[picture.box]).map(([x,y,w,h])=>`<rect x="${x}" y="${y}" width="${w}" height="${h}"/>`).join('')}</clipPath></defs><image href="${imageFiles[picture.src]}" width="2048" height="1176" clip-path="url(#${id})"/></svg>`}
 function gallery(p){
  const c=countries[p];return `<div class="country-gallery-title">${c.name}</div><div class="country-pictures count-${c.pictures.length}">${c.pictures.map((pic,i)=>`<figure class="country-picture ${pic.wide?'wide':''}" data-token="p${p}-image${i}">${crop(pic)}<figcaption>${pic.caption}</figcaption></figure>`).join('')}</div>`;
@@ -130,7 +169,7 @@ function layout(anchor){
  const requested=(Number(location.hash.split('-')[2])||1)-1;
  const anchored=anchor?pages.findIndex(page=>page.cells.some(t=>t.id===anchor)):-1;
  const index=anchored>=0?anchored:Math.max(0,Math.min(requested,pages.length-1)),page=pages[index];
- board.innerHTML=page.cells.map(t=>{
+ board.innerHTML=studyMarkup(page)+page.cells.map(t=>{
   const style=`right:${24+t.col*page.pitch}px;top:${10+t.row*page.rowHeight}px;width:${FONT*1.12}px;height:${page.rowHeight*t.span}px`;
   if(t.type==='char')return `<span class="lesson9-cell flow-cell" style="${style}" data-token="${t.id}"><span class="flow-char ${t.blue?'learning-word':''}">${t.char}</span></span>`;
   return `<span class="lesson9-cell ${t.type==='indent'?'flow-indent':'flow-number-slot'}" data-token="${t.id}" style="${style}" ${t.type==='indent'?'aria-label="段首空兩個全型字"':''}><span class="inline-number" aria-label="課本第${t.number}行">${t.number}</span>${t.type==='indent'?`<span class="flow-paragraph-label">第${numerals[t.p]}段</span>`:''}</span>`;
@@ -149,6 +188,6 @@ function layout(anchor){
  if(anchor)history.replaceState(history.state,'','#lesson9-text-'+(index+1));
  lessonInk.refresh();return index+1;
 }
-const api={sections,countries,tokensForLesson,paginate,catalogue,placeholder,reader,layout,FONT,BLUE};
+const api={sections,countries,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else window.lesson9=api;
 })();

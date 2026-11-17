@@ -8,7 +8,12 @@
 .lesson9-card-icon{float:right;font-size:54px;line-height:1;color:var(--green)}
 .lesson9-source{font-size:19px;color:#65776b}
 .lesson9-board{display:block;padding:0;font-size:85px;overflow:hidden}
-.lesson9-cell{position:absolute;display:flex;align-items:flex-start;justify-content:center;min-height:0}
+.lesson9-cell{position:absolute;display:flex;align-items:flex-start;justify-content:center;min-height:0;z-index:1}
+.lesson9-study-band,.lesson9-study-label{position:absolute;pointer-events:none}
+.lesson9-study-band{z-index:0;border-radius:3px;background:var(--study-fill);box-shadow:0 0 5px var(--study-fill)}
+.lesson9-study-label{z-index:2;box-sizing:border-box;width:24px;height:134px;padding:6px 0;border:1px solid var(--study-color);border-radius:13px;background:#fff;color:var(--study-color);font-size:21px;line-height:22px;writing-mode:vertical-rl;text-orientation:upright;text-align:center;letter-spacing:0}
+.lesson9-board .rhetoric{--study-fill:#d7efef;--study-color:#129ea8}
+.lesson9-board .cause{--study-fill:#fee1e8;--study-color:#ec4c83}
 .lesson9-cell .flow-char{font-size:85px}
 .lesson9-cell .learning-word{color:#005ead}
 .lesson9-cell.flow-number-slot{align-items:center}
