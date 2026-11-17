@@ -40,3 +40,14 @@
 @media(max-width:1000px){#lesson-note .note-close{width:50px;min-height:50px;height:50px;font-size:40px}#lesson-note .note-tabs button{font-size:17px;min-height:44px;padding:6px}.note-controls{gap:5px}#lesson-note .note-footer{gap:8px}.note-tools{width:58px}.note-tools .rail-control{font-size:14px;min-height:52px}}
 @media(max-height:650px){.nav-rail .rail-control,.reading-mode .nav-rail .rail-control{min-height:43px;font-size:13px}.nav-rail{gap:3px;bottom:10px}.rail-control svg{width:20px;height:20px}.ink-tool-symbol{font-size:20px}.ink-panel{bottom:12px;max-height:calc(100dvh - 28px);overflow:auto}}
 @media(max-width:600px){.note-controls{flex-direction:column!important;align-items:stretch}.note-controls-right .note-close{align-self:flex-end}#lesson-note .note-footer{align-items:flex-end}.ink-panel{width:270px}.ink-panel.left{left:65px}.ink-panel.right{right:65px}#lesson-note .ink-panel.left{left:6px}#lesson-note .ink-panel.right{right:6px}}
+/* One-tap pen and direct undo/redo on both sides. */
+[data-ink-action="paint"]{touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+[data-ink-action].ink-selected{background:var(--green)!important;color:white!important;border-color:var(--green)!important;box-shadow:inset 0 0 0 2px #fff4}
+.note-tools .rail-control:disabled{opacity:.3;cursor:default}
+:root{--white-arrow:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='40' viewBox='0 0 32 40'%3E%3Cpath d='M3 2 L3 31 L11 24 L17 37 L23 34 L17 22 L29 22 Z' fill='white' stroke='%23172b29' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E") 3 2,default}
+body,body a,body button,.continuous-board,.note-content,.ink-layer.ink-active,.ink-layer.ink-erase{cursor:var(--white-arrow)}
+.touch-arrow{position:fixed;width:32px;height:40px;transform:translate(-3px,-2px);z-index:100;pointer-events:none;filter:drop-shadow(1px 2px 2px #0004)}
+.touch-arrow svg{display:block;width:100%;height:100%}
+#lesson-note .touch-arrow{position:absolute}
+
+body.custom-arrow,body.custom-arrow *{cursor:none!important}

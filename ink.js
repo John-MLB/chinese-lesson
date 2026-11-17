@@ -6,7 +6,7 @@ const NOTE_IDS=['sentence','definition','idiom','examples','giraffe','benefits',
 const MAX_POINTS=150000, MAX_BYTES=12*1024*1024;
 const clone=value=>JSON.parse(JSON.stringify(value));
 let book={format:'chinese-lesson-notes',version:1,lesson:'lesson8',surfaces:{}};
-let past=[],future=[],mode='view',color=COLORS[0],width=6,surface=null,panel=null,gesture=null,saveTimer,toastTimer;
+let past=[],future=[],mode='view',color=COLORS[0],width=3,surface=null,panel=null,gesture=null,saveTimer,toastTimer;
 let localProblem=false;
 function validate(raw){
  if(!raw||raw.format!=='chinese-lesson-notes'||raw.version!==1||raw.lesson!=='lesson8'||!raw.surfaces||typeof raw.surfaces!=='object'||Array.isArray(raw.surfaces))throw Error('這不是本站的第八課筆記檔。');
@@ -27,26 +27,49 @@ function validate(raw){
  }return clean;
 }
 function pointDistance(p,a,b){const dx=b.x-a.x,dy=b.y-a.y,l=dx*dx+dy*dy,t=l?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/l)):0;return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy)}
+// Short tap toggles drawing; hold opens settings without an extra toggle on release.
+function bindPenPress(target,tap,hold,schedule=setTimeout,unschedule=clearTimeout){
+ let active=null,timer=null,suppress=false;
+ const stop=()=>{if(timer!==null)unschedule(timer);timer=null};
+ const cancel=()=>{stop();if(active)suppress=true;active=null};
+ target.onpointerdown=e=>{if(e.isPrimary===false||e.button!==0)return;stop();suppress=false;active={id:e.pointerId,x:e.clientX,y:e.clientY,held:false,moved:false};target.setPointerCapture?.(e.pointerId);timer=schedule(()=>{timer=null;if(active&&!active.moved){active.held=true;hold()}},600)};
+ target.onpointermove=e=>{if(active&&e.pointerId===active.id&&Math.hypot(e.clientX-active.x,e.clientY-active.y)>12){active.moved=true;stop()}};
+ target.onpointerup=e=>{if(!active||e.pointerId!==active.id)return;stop();suppress=active.held||active.moved;active=null};
+ target.onpointercancel=cancel;
+ target.onlostpointercapture=()=>{if(active)cancel()};
+ target.onclick=e=>{if(suppress&&e.detail!==0){suppress=false;return}suppress=false;tap()};
+ target.oncontextmenu=e=>{e.preventDefault();if(!active?.held){stop();if(active)active.held=true;hold()}};
+ target.onkeydown=e=>{if(e.key==='ArrowDown'){e.preventDefault();hold()}};
+ return {cancel};
+}
 // Pure helpers are shared by the browser and the small regression check.
-if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance};return}
+if(typeof module!=='undefined'&&module.exports){module.exports={validate,pointDistance,bindPenPress};return}
 try{const saved=localStorage.getItem(STORAGE);if(saved)book=validate(JSON.parse(saved))}catch{localProblem=true}
 function saveLocal(){clearTimeout(saveTimer);try{localStorage.setItem(STORAGE,JSON.stringify(book));localProblem=false;return true}catch{localProblem=true;toast('這台電腦暫時無法自動保存，請按「存檔」下載筆記檔。');return false}}
 function remember(before){past.push(before);if(past.length>25)past.shift();future=[];saveTimer=setTimeout(saveLocal,300);updatePanel();}
 function toast(message){clearTimeout(toastTimer);document.querySelectorAll('.ink-toast').forEach(e=>e.remove());const el=document.createElement('div');el.className='ink-toast';el.setAttribute('role','status');el.textContent=message;host().append(el);toastTimer=setTimeout(()=>el.remove(),6000)}
 function host(){const d=document.getElementById('lesson-note');return d?.open?d:document.body}
 function closePanel(){panel?.remove();panel=null}
-function setMode(next){mode=next;closePanel();syncMode()}
+function setMode(next){finishGesture();mode=next;closePanel();syncMode()}
 function syncMode(){
+ touchCursor.hidden=true;document.body.classList.remove('custom-arrow');
  document.querySelectorAll('.ink-layer').forEach(el=>{el.classList.toggle('ink-active',mode!=='view'&&el===surface?.svg);el.classList.toggle('ink-erase',mode==='eraser')});
- document.querySelectorAll('[data-ink-action]').forEach(b=>{const selected=(b.dataset.inkAction==='erase'&&mode==='eraser')||(b.dataset.inkAction==='paint'&&['pen','line'].includes(mode));b.classList.toggle('ink-selected',selected);b.setAttribute('aria-pressed',String(selected))});
+ document.querySelectorAll('[data-ink-action]').forEach(b=>{const selected=(b.dataset.inkAction==='erase'&&mode==='eraser')||(b.dataset.inkAction==='paint'&&['pen','line'].includes(mode));b.classList.toggle('ink-selected',selected);if(['paint','erase'].includes(b.dataset.inkAction))b.setAttribute('aria-pressed',String(selected));else b.removeAttribute('aria-pressed')});
  document.querySelectorAll('.ink-mode-banner').forEach(e=>e.remove());
  if(mode!=='view'&&surface){const b=document.createElement('button');b.className='ink-mode-banner';b.textContent=({pen:'手繪',line:'直線',eraser:'橡皮擦'}[mode])+'中・完成書寫';b.onclick=()=>setMode('view');host().append(b)}
 }
-function toolMarkup(){return `<button class="rail-control" data-ink-action="paint" aria-label="畫筆工具"><span class="ink-tool-symbol" aria-hidden="true">✎</span><span>畫筆</span></button><button class="rail-control" data-ink-action="erase" aria-label="橡皮擦（擦除整筆）"><span class="ink-tool-symbol" aria-hidden="true">▱</span><span>橡皮擦</span></button><button class="rail-control" data-ink-action="save" aria-label="儲存與開啟筆記"><span class="ink-tool-symbol" aria-hidden="true">▣</span><span>存檔</span></button>`}
+function toolMarkup(){return `<button class="rail-control" data-ink-action="paint" aria-label="畫筆：輕點切換，長按設定" title="輕點：書寫／滑鼠；長按：畫筆設定"><span class="ink-tool-symbol" aria-hidden="true">✎</span><span>畫筆</span></button><button class="rail-control" data-ink-action="erase" aria-label="橡皮擦（擦除整筆）"><span class="ink-tool-symbol" aria-hidden="true">▱</span><span>橡皮擦</span></button><button class="rail-control" data-ink-action="undo" data-history="undo" aria-label="上一步：復原筆跡" title="上一步：復原筆跡"><span class="ink-tool-symbol" aria-hidden="true">↶</span><span>上一步</span></button><button class="rail-control" data-ink-action="redo" data-history="redo" aria-label="下一步：重做筆跡" title="下一步：重做筆跡"><span class="ink-tool-symbol" aria-hidden="true">↷</span><span>下一步</span></button><button class="rail-control" data-ink-action="save" aria-label="儲存與開啟筆記"><span class="ink-tool-symbol" aria-hidden="true">▣</span><span>存檔</span></button>`}
+const penPresses=new WeakMap();
 function setupTools(){
  document.querySelectorAll('.nav-rail').forEach(rail=>{if(!rail.querySelector('[data-ink-action]'))rail.insertAdjacentHTML('beforeend',toolMarkup());rail.querySelectorAll('[data-ink-action]').forEach(b=>b.hidden=!document.body.classList.contains('reading-mode'));rail.dataset.inkSide=rail.classList.contains('nav-rail-left')?'left':'right'});
  document.querySelectorAll('.note-tools').forEach(rail=>{if(!rail.children.length)rail.innerHTML=toolMarkup()});
- document.querySelectorAll('[data-ink-action]').forEach(b=>b.onclick=()=>{if(b.dataset.inkAction==='erase'){setMode(mode==='eraser'?'view':'eraser');return}openPanel(b.dataset.inkAction,b.closest('[data-ink-side]').dataset.inkSide)})
+ document.querySelectorAll('[data-ink-action]').forEach(b=>{
+  const action=b.dataset.inkAction;
+  if(action==='paint'){
+   if(!penPresses.has(b))penPresses.set(b,bindPenPress(b,()=>{if(['pen','line'].includes(mode))setMode('view');else{color=COLORS[0];width=3;setMode('pen')}},()=>{if(!['pen','line'].includes(mode))setMode('pen');openPanel('paint',b.closest('[data-ink-side]').dataset.inkSide)}));
+  }else b.onclick=()=>{if(action==='erase')setMode(mode==='eraser'?'view':'eraser');else if(action==='undo'||action==='redo')undoRedo(action==='redo');else openPanel(action,b.closest('[data-ink-side]').dataset.inkSide)};
+ });
+ updatePanel();
 }
 function button(text,action){const b=document.createElement('button');b.type='button';b.textContent=text;b.onclick=action;return b}
 function openPanel(kind,side){
@@ -54,11 +77,11 @@ function openPanel(kind,side){
  const h=document.createElement('h2');h.textContent=kind==='paint'?'畫筆工具':'我的課堂筆記';el.append(h);
  if(kind==='paint'){
   const grid=document.createElement('div');grid.className='ink-grid';
-  [['操作','view'],['手繪','pen'],['直線','line'],['橡皮擦','eraser']].forEach(([label,value])=>{const b=button(label,()=>setMode(value));b.classList.toggle('primary',mode===value);grid.append(b)});el.append(grid);
+  [['滑鼠','view'],['手繪','pen'],['直線','line'],['橡皮擦','eraser']].forEach(([label,value])=>{const b=button(label,()=>setMode(value));b.classList.toggle('primary',mode===value);grid.append(b)});el.append(grid);
   const colors=document.createElement('div');colors.className='ink-colors';COLORS.forEach((c,i)=>{const b=button('',()=>{color=c;openPanel('paint',side)});b.setAttribute('aria-label',['紅色','藍色','黑色','綠色'][i]);b.setAttribute('aria-pressed',String(color===c));b.classList.toggle('ink-selected',color===c);const dot=document.createElement('span');dot.className='ink-swatch';dot.style.background=c;b.append(dot);colors.append(b)});el.append(colors);
   const sizes=document.createElement('div');sizes.className='ink-grid';[3,6,10].forEach((n,i)=>{const b=button(['細筆','中筆','粗筆'][i],()=>{width=n;openPanel('paint',side)});b.classList.toggle('primary',width===n);sizes.append(b)});el.append(sizes);
-  const history=document.createElement('div');history.className='ink-grid';const undo=button('復原',()=>undoRedo(false));undo.dataset.history='undo';const redo=button('重做',()=>undoRedo(true));redo.dataset.history='redo';history.append(undo,redo);el.append(history);
-  const hint=document.createElement('p');hint.textContent='橡皮擦會擦掉碰到的整筆。選「操作」後，可翻頁、捲動及點課文註記。';el.append(hint);
+  const history=document.createElement('div');history.className='ink-grid';const undo=button('上一步',()=>undoRedo(false));undo.dataset.history='undo';const redo=button('下一步',()=>undoRedo(true));redo.dataset.history='redo';history.append(undo,redo);el.append(history);
+  const hint=document.createElement('p');hint.textContent='輕點畫筆：書寫／滑鼠。長按畫筆：開啟設定。上一步可復原，下一步可重做。橡皮擦會擦掉整筆。';el.append(hint);
  }else{
   const hint=document.createElement('p');hint.textContent='筆跡會自動記在這台電腦的此瀏覽器。請另存筆記檔，以免清除瀏覽器資料後遺失。';el.append(hint);
   [['下載筆記到本機',download],['存到同步資料夾',saveFolder],['開啟筆記檔',importFile]].forEach(([label,action])=>{const b=button(label,action);b.className='ink-full';el.append(b)});
@@ -67,7 +90,7 @@ function openPanel(kind,side){
  }
  const close=button('關閉工具',closePanel);close.className='ink-full';el.append(close);host().append(el);updatePanel();
 }
-function updatePanel(){if(!panel)return;panel.querySelectorAll('[data-history]').forEach(b=>b.disabled=!(b.dataset.history==='undo'?past.length:future.length))}
+function updatePanel(){document.querySelectorAll('[data-history]').forEach(b=>b.disabled=!(b.dataset.history==='undo'?past.length:future.length))}
 function undoRedo(redo){finishGesture();const from=redo?future:past,to=redo?past:future;if(!from.length)return;to.push(clone(book));book=from.pop();saveLocal();redraw();updatePanel()}
 function stamp(){return new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}
 function serialized(){return JSON.stringify({...book,savedAt:new Date().toISOString()},null,2)}
@@ -89,7 +112,7 @@ function importFile(){
    const apply=()=>{const before=clone(book);book=incoming;remember(before);saveLocal();setMode('view');redraw();toast('已開啟筆記，可以繼續書寫。')};
    if(Object.values(book.surfaces).some(s=>s.length)){
     const side=panel?.classList.contains('right')?'right':'left';closePanel();panel=document.createElement('section');panel.className='ink-panel '+side;panel.setAttribute('aria-label','確認開啟筆記');
-    const title=document.createElement('h2');title.textContent='開啟這份筆記？';const message=document.createElement('p');message.textContent='將取代目前的筆跡。開啟後仍可用「畫筆 → 復原」還原。';
+    const title=document.createElement('h2');title.textContent='開啟這份筆記？';const message=document.createElement('p');message.textContent='將取代目前的筆跡。開啟後仍可用「上一步」還原。';
     const yes=button('開啟這份筆記',apply),no=button('保留目前筆跡',closePanel);yes.className='ink-full primary';no.className='ink-full';panel.append(title,message,yes,no);host().append(panel);
    }else apply();
   }catch(err){toast(err instanceof SyntaxError?'檔案不是正確的筆記格式；目前筆跡沒有變動。':err.message)}
@@ -134,7 +157,7 @@ function finishGesture(cancel=false){
  if(g.stroke){(book.surfaces[surface.key]||=[]).push(g.stroke);try{validate(book)}catch{book=g.before;toast('這份筆記已達容量上限，請先存檔。');redraw();return}}
  if(JSON.stringify(g.before.surfaces)!==JSON.stringify(book.surfaces))remember(g.before);redraw();
 }
-function beforeChange(){finishGesture();closePanel();setMode('view');surface?.observer?.disconnect();surface?.svg.remove();surface=null}
+function beforeChange(){document.querySelectorAll('[data-ink-action="paint"]').forEach(b=>penPresses.get(b)?.cancel());finishGesture();closePanel();setMode('view');surface?.observer?.disconnect();surface?.svg.remove();surface=null}
 function refresh(){
  finishGesture();surface?.observer?.disconnect();surface?.svg.remove();surface=null;setupTools();
  const dialog=document.getElementById('lesson-note'),root=dialog.open?dialog.querySelector('.note-paper'):document.querySelector('.continuous-board');
@@ -145,6 +168,19 @@ function refresh(){
  svg.addEventListener('pointerdown',begin);svg.addEventListener('pointermove',move);svg.addEventListener('pointerup',e=>{if(gesture?.id===e.pointerId){move(e);finishGesture()}});svg.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)finishGesture(true)});svg.addEventListener('lostpointercapture',e=>{if(gesture?.id===e.pointerId)finishGesture()});
  const observer=new ResizeObserver(()=>{if(surface?.svg===svg)redraw()});observer.observe(root);surface.observer=observer;root.querySelectorAll('img').forEach(img=>img.addEventListener('load',()=>{if(surface?.svg===svg)redraw()},{once:true}));redraw();syncMode();
 }
+const touchCursor=document.createElement('div');touchCursor.className='touch-arrow';touchCursor.hidden=true;touchCursor.setAttribute('aria-hidden','true');
+touchCursor.innerHTML='<svg viewBox="0 0 32 40"><path d="M3 2 L3 31 L11 24 L17 37 L23 34 L17 22 L29 22 Z" fill="white" stroke="#172b29" stroke-width="2" stroke-linejoin="round"/></svg>';
+function moveCursor(e){
+ if(!e.isPrimary)return;
+ if(e.pointerType!=='mouse'&&mode!=='view'){touchCursor.hidden=true;document.body.classList.remove('custom-arrow');return}
+ const parent=host();if(touchCursor.parentNode!==parent)parent.append(touchCursor);
+ const d=parent===document.body?{left:0,top:0}:parent.getBoundingClientRect();
+ touchCursor.style.left=(e.clientX-d.left)+'px';touchCursor.style.top=(e.clientY-d.top)+'px';touchCursor.hidden=false;document.body.classList.toggle('custom-arrow',e.pointerType==='mouse');
+}
+document.addEventListener('pointerdown',moveCursor,true);document.addEventListener('pointermove',moveCursor,true);
+document.addEventListener('pointerup',e=>{if(e.pointerType!=='mouse')queueMicrotask(()=>moveCursor(e))},true);
+const hideCursor=()=>{touchCursor.hidden=true;document.body.classList.remove('custom-arrow')};
+window.addEventListener('blur',hideCursor);document.addEventListener('pointerout',e=>{if(!e.relatedTarget)hideCursor()});
 window.lessonInk={beforeChange,refresh};
 window.addEventListener('pagehide',()=>{finishGesture();saveLocal()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){finishGesture();saveLocal()}});

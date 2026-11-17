@@ -14,3 +14,21 @@ assert.equal(pointDistance({x:5,y:3},{x:0,y:0},{x:10,y:0}),3);
 assert.equal(pointDistance({x:-4,y:3},{x:0,y:0},{x:10,y:0}),5);
 assert.equal(pointDistance({x:0,y:5},{x:0,y:0},{x:0,y:0}),5);
 console.log('PASS: editable note round-trip, unsafe/invalid data rejection, eraser geometry');
+const {bindPenPress}=require('./ink.js');
+function fixture(){const target={},timers=new Map();let seq=0,taps=0,holds=0;const handle=bindPenPress(target,()=>taps++,()=>holds++,fn=>{timers.set(++seq,fn);return seq},id=>timers.delete(id));const e=(x=10,y=10)=>({isPrimary:true,button:0,pointerId:1,clientX:x,clientY:y,detail:1,preventDefault(){}});return {target,handle,e,run:()=>{for(const fn of [...timers.values()])fn();timers.clear()},counts:()=>[taps,holds]}}
+{
+ const f=fixture();f.target.onpointerdown(f.e());f.target.onpointerup(f.e());f.target.onclick(f.e());f.run();assert.deepEqual(f.counts(),[1,0]);
+}
+{
+ const f=fixture();f.target.onpointerdown(f.e());f.run();f.target.onpointerup(f.e());f.target.onclick(f.e());assert.deepEqual(f.counts(),[0,1]);f.target.onpointerdown(f.e());f.target.onpointerup(f.e());f.target.onclick(f.e());assert.deepEqual(f.counts(),[1,1]);
+}
+{
+ const f=fixture();f.target.onpointerdown(f.e());f.target.onpointermove(f.e(50,50));f.run();f.target.onpointerup(f.e());f.target.onclick(f.e());assert.deepEqual(f.counts(),[0,0]);
+}
+{
+ const f=fixture();f.target.onpointerdown(f.e());f.target.onpointercancel();f.run();f.target.onclick(f.e());assert.deepEqual(f.counts(),[0,0]);f.target.onclick({...f.e(),detail:0});assert.deepEqual(f.counts(),[1,0]);
+}
+{
+ const f=fixture();f.target.onpointerdown(f.e());f.handle.cancel();f.run();assert.deepEqual(f.counts(),[0,0]);
+}
+console.log('PASS: short tap, long hold, release suppression, move/cancel and keyboard click');
