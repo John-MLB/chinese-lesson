@@ -1,0 +1,42 @@
+/* Touch handwriting and mirrored, reachable controls. */
+.continuous-board,.note-paper{position:relative;isolation:isolate}
+.ink-layer{position:absolute;left:0;top:0;z-index:4;overflow:hidden;pointer-events:none;user-select:none;-webkit-user-select:none}
+.ink-layer.ink-active{pointer-events:auto;touch-action:none;cursor:crosshair}
+.ink-layer.ink-erase{cursor:cell}
+.ink-layer path{fill:none;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+.nav-rail{gap:5px;bottom:3dvh}
+.nav-rail .rail-control,.reading-mode .nav-rail .rail-control{min-height:clamp(48px,5dvh,92px);gap:2px}
+.ink-tool-symbol{font-size:24px;line-height:1}
+.ink-selected{background:#ffe7ae!important;border-color:#9e5416!important;color:#70370e!important}
+.note-middle{display:flex;flex:1;min-height:0;gap:4px}
+#lesson-note .note-content{padding:16px 1vw 22px;min-width:0}
+.note-paper{min-height:100%;padding:2px 0 14px}
+.note-tools{flex:none;width:clamp(60px,4.6vw,100px);display:flex;flex-direction:column;justify-content:flex-end;gap:7px;padding:8px 4px}
+.note-tools .rail-control{display:flex;flex-direction:column;gap:3px;width:100%;font-size:clamp(15px,1.1vw,26px);min-height:58px;padding:5px 2px;line-height:1.1}
+.note-controls{display:flex;align-items:center;gap:10px;min-width:0}
+.note-controls-right{flex-direction:row-reverse}
+#lesson-note .note-tabs{flex-wrap:wrap;gap:8px}
+#lesson-note .note-tabs button{font-size:clamp(18px,1.6vw,38px);padding:8px 10px}
+#lesson-note .note-footer{gap:18px;padding:10px}
+.ink-panel{position:fixed;z-index:50;bottom:4dvh;width:320px;max-width:calc(100vw - 24px);background:#fffdf7;color:var(--ink);border:2px solid var(--green);border-radius:14px;padding:14px;box-shadow:0 12px 42px #142b2940;font-family:var(--font-kai)}
+.ink-panel.left{left:calc(var(--rail-width) + 10px)}.ink-panel.right{right:calc(var(--rail-width) + 10px)}
+#lesson-note .ink-panel{position:absolute;bottom:100px;max-height:calc(100% - 115px);overflow:auto}
+#lesson-note .ink-panel.left{left:65px}#lesson-note .ink-panel.right{right:65px}
+.ink-panel h2{font-size:25px;margin:0 0 10px;line-height:1.3}
+.ink-panel p{font-size:17px;line-height:1.5;margin:9px 0}
+.ink-panel button,.reading-mode .ink-panel button{font-size:20px;min-height:48px;padding:7px 10px;border-radius:8px}
+.ink-panel .ink-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.ink-panel .ink-colors{display:flex;gap:10px;margin:10px 0}
+.ink-panel .ink-colors button{width:48px;height:48px;min-height:48px;padding:4px}
+.ink-swatch{width:28px;height:28px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #777}
+.ink-panel .ink-full{width:100%;margin-top:8px}
+.ink-panel button:disabled{opacity:.35;cursor:default}
+.ink-panel .ink-status{font-size:17px;min-height:1.5em;color:#426257}
+.ink-mode-banner{position:fixed;z-index:20;bottom:8px;left:50%;transform:translateX(-50%);border-radius:12px;box-shadow:0 3px 18px #0003;background:#fff4d7}
+.reading-mode .ink-mode-banner{font-size:21px;min-height:48px;padding:8px 18px}
+#lesson-note .ink-mode-banner{position:absolute;bottom:100px;z-index:6;font-size:20px;min-height:46px}
+.ink-toast{position:fixed;z-index:60;bottom:12px;left:50%;transform:translateX(-50%);max-width:min(600px,85vw);background:#173f38;color:white;padding:12px 20px;border-radius:10px;font-size:20px;line-height:1.4;pointer-events:none;text-align:center}
+#lesson-note .ink-toast{position:absolute;bottom:100px}
+@media(max-width:1000px){#lesson-note .note-close{width:50px;min-height:50px;height:50px;font-size:40px}#lesson-note .note-tabs button{font-size:17px;min-height:44px;padding:6px}.note-controls{gap:5px}#lesson-note .note-footer{gap:8px}.note-tools{width:58px}.note-tools .rail-control{font-size:14px;min-height:52px}}
+@media(max-height:650px){.nav-rail .rail-control,.reading-mode .nav-rail .rail-control{min-height:43px;font-size:13px}.nav-rail{gap:3px;bottom:10px}.rail-control svg{width:20px;height:20px}.ink-tool-symbol{font-size:20px}.ink-panel{bottom:12px;max-height:calc(100dvh - 28px);overflow:auto}}
+@media(max-width:600px){.note-controls{flex-direction:column!important;align-items:stretch}.note-controls-right .note-close{align-self:flex-end}#lesson-note .note-footer{align-items:flex-end}.ink-panel{width:270px}.ink-panel.left{left:65px}.ink-panel.right{right:65px}#lesson-note .ink-panel.left{left:6px}#lesson-note .ink-panel.right{right:6px}}
