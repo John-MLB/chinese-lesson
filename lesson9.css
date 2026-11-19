@@ -22,6 +22,11 @@
 .lesson9-board .lesson9-red-arrow{position:absolute;left:-27px;top:14px;z-index:3;display:flex;align-items:center;justify-content:center;width:34px;height:48px;min-height:0;padding:0;border:0;border-radius:4px;background:transparent;touch-action:manipulation}
 .lesson9-red-arrow svg{flex:none;width:30px;height:28px;fill:#f04435;filter:drop-shadow(0 0 1px white)}
 .lesson9-red-arrow:hover,.lesson9-red-arrow:focus-visible{background:#ffe7df;outline:2px solid #ee4936}
+.lesson9-board .lesson9-reading-link{position:absolute;left:-28px;top:4px;z-index:4;display:flex;align-items:center;justify-content:center;box-sizing:border-box;width:29px;height:64px;min-width:0;min-height:0;padding:5px 2px;margin:0;border:1.5px solid #15574c;border-radius:7px;background:#edf7f0;color:#15574c;font-family:inherit;font-size:24px;font-weight:400;line-height:1;letter-spacing:2px;writing-mode:vertical-rl;text-orientation:upright;white-space:nowrap;cursor:pointer;touch-action:manipulation}
+.lesson9-board .lesson9-reading-link.video{border-color:#aa5415;color:#99480d;background:#fff3dc}
+.lesson9-board .lesson9-reading-link:hover{background:#d6eadd}
+.lesson9-board .lesson9-reading-link.video:hover{background:#ffe5b0}
+.lesson9-board .lesson9-reading-link:focus-visible{outline:3px solid #e69825;outline-offset:2px}
 .lesson9-cell.flow-number-slot{align-items:center}
 .lesson9-cell.flow-indent .flow-paragraph-label{right:-22px;top:0;font-size:25px;line-height:1.15}
 .lesson9-cell.flow-indent .inline-number{top:0}

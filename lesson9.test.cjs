@@ -66,3 +66,40 @@ assert.equal(noteContent('picture-0-3'),null);
 assert.equal(noteContent('word-unknown'),null);
 assert.throws(()=>validate({...sample,surfaces:{'note:l9-word-unknown':[]}}));
 console.log('PASS: 14 word entries / 28 original examples, 14 picture introductions, 10 character groups; 38 popup note round-trips and cross-lesson rejection');
+const {readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,FONT}=require('./lesson9.js');
+assert.equal(FONT,85);
+assert.equal(readingLinks.length,7);
+assert.deepEqual(readingLinks.map(link=>readingLinkAnchor(link)),[
+ 'p0-l1-c7','p0-l4-c3','p0-l3-c15','p0-l5-c0','p1-l1-c4','p1-l2-c11','p1-l5-c1'
+],'seven additions stay beside the requested textbook words / sentence punctuation');
+assert.deepEqual(readingLinks.filter(link=>link.kind==='video').map(link=>link.href),[
+ 'https://youtu.be/I9kaasea5rA','https://youtu.be/4k_13OmWNSE','https://youtu.be/zaxh11eRXTE','https://youtu.be/qOlnIF6z2mA'
+]);
+for(const link of readingLinks){
+ const token=tokens.find(t=>t.id===readingLinkAnchor(link));assert(token,'every addition has an existing text anchor');
+ assert(!token.glyph,'a new badge must not cover the red arrow on the same character');
+ const markup=readingLinkMarkup(token.id);
+ if(link.kind==='video'){
+  assert(markup.startsWith('<a '));assert(markup.includes('target="_blank"'));assert(markup.includes('rel="noopener noreferrer"'));
+  assert(!markup.includes('data-lesson9-note='),'videos use native new-tab links, not explanation dialogs');
+ }else{
+  assert(markup.startsWith('<button '));assert(markup.includes('aria-haspopup="dialog"'));
+  const note=noteContent(link.id);assert(note?.html.includes('<details'));assert(note.html.includes('<h3>'));
+  const saved={...sample,surfaces:{['note:l9-'+link.id]:[{tool:'pen',color:'#c43d32',width:3,points:[{a:'b0',x:.5,y:.5}]}]}};
+  assert.deepEqual(validate(JSON.parse(JSON.stringify(saved))),saved,'knowledge popup handwriting survives export/import');
+  assert.throws(()=>validate({...saved,lesson:'lesson8'}));
+ }
+}
+assert.equal(noteContent('knowledge-unknown'),null);
+assert(noteContent('knowledge-monkhood').html.includes('並不是每一位泰國男性都一定會出家'));
+assert.equal(Object.keys(knowledgeNotes).length,3);
+for(const [w,h] of [[1363,938],[1660,930],[1200,740],[980,620],[600,500],[240,540],[3490,1950]]){
+ const pages=paginate(w,h);
+ const anchors=pages.flatMap(p=>p.cells.flatMap(t=>readingLinks.filter(link=>readingLinkAnchor(link)===t.id).map(link=>link.id)));
+ assert.deepEqual([...anchors].sort(),readingLinks.map(link=>link.id).sort(),'all seven additions remain reachable across pagination');
+ for(const page of pages)for(const t of page.cells.filter(t=>readingLinkMarkup(t.id))){
+  const left=w-(24+t.col*page.pitch)-FONT*1.12-28,top=10+t.row*page.rowHeight+4;
+  assert(left>=0&&top+64<=h,'badges stay inside the reading board');
+ }
+}
+console.log('PASS: 4 exact new-tab video links, 3 sourced knowledge dialogs, stable text anchors, popup note round-trips and badge bounds');

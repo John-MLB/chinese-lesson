@@ -8,7 +8,8 @@ const NOTE_IDS=['sentence','definition','idiom','examples','giraffe','benefits',
 const NOTE9_IDS=[
  ...['buddha','thailand','temple','splendid','monk','stroll','dealings','egypt','nile','lowland','dike','tulip','atmosphere','rowing'].map(id=>'l9-word-'+id),
  ...['buddha','terrain','prevent','dike','row','egypt','thai','stroll','tide','hua'].map(id=>'l9-glyph-'+id),
- ...[3,4,3,4].flatMap((count,p)=>Array.from({length:count},(_,i)=>`l9-picture-${p}-${i}`))
+ ...[3,4,3,4].flatMap((count,p)=>Array.from({length:count},(_,i)=>`l9-picture-${p}-${i}`)),
+ ...['monkhood','monarchy','market'].map(id=>'l9-knowledge-'+id)
 ];
 const MAX_POINTS=150000, MAX_BYTES=12*1024*1024;
 const clone=value=>JSON.parse(JSON.stringify(value));

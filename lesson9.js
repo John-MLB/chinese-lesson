@@ -127,6 +127,41 @@ const pictureNotes=[
   {title:'滑雪',paragraphs:['插圖中的長板是滑雪板，細長的桿子是滑雪杖。奧地利有高山和雪地，滑雪是當地受歡迎的冬季活動之一。','滑雪時需要保持平衡，也要學習轉彎和停下來。選擇適合自己能力的雪道，戴好安全帽，並且注意前方與旁邊的人，才能安心享受雪地活動。'],sources:[['奧地利國家旅遊局','https://www.austria.info/en-us/inspiration/skiing-and-winter/']]}
  ]
 ];
+// Teacher-added links use existing character anchors; they do not occupy a text
+// cell or change page breaks / saved handwriting positions. p and l are zero-based.
+const readingLinks=[
+ {id:'video-thailand',kind:'video',p:0,l:1,phrase:'泰國。',offset:2,title:'認識泰國',href:'https://youtu.be/I9kaasea5rA'},
+ {id:'knowledge-monkhood',kind:'knowledge',p:0,l:4,phrase:'是如此。',offset:3,title:'為什麼要短期出家？'},
+ {id:'knowledge-monarchy',kind:'knowledge',p:0,l:3,phrase:'國王',offset:0,title:'泰國國王的地位與權力'},
+ {id:'knowledge-market',kind:'knowledge',p:0,l:5,phrase:'場。',offset:0,title:'水上市場怎麼做生意？'},
+ {id:'video-egypt',kind:'video',p:1,l:1,phrase:'埃及',offset:1,title:'認識埃及',href:'https://youtu.be/4k_13OmWNSE'},
+ {id:'video-nile',kind:'video',p:1,l:2,phrase:'尼羅河',offset:1,title:'認識尼羅河',href:'https://youtu.be/zaxh11eRXTE'},
+ {id:'video-pyramids',kind:'video',p:1,l:5,phrase:'金字塔',offset:1,title:'認識金字塔',href:'https://youtu.be/qOlnIF6z2mA'}
+];
+function readingLinkAnchor(link){
+ const line=countries[link.p]?.lines[link.l]?.replace(/[【】]/g,'')||'',start=line.indexOf(link.phrase);
+ return start<0?null:`p${link.p}-l${link.l}-c${start+link.offset}`;
+}
+const knowledgeNotes={
+ monkhood:{title:'為什麼要短期出家？',summary:'課文介紹的是一種傳統習俗，並不是每一位泰國男性都一定會出家。',parts:[
+  ['為什麼要出家一段時間？','在泰國，許多信奉佛教的男性，會在成年後到寺廟住一段時間。他們學習佛法，也就是佛教的道理，並遵守寺廟的生活規矩，練習讓自己安定下來。'],
+  ['有什麼意義？','許多家庭相信，出家修行可以累積功德，為家人帶來福報。兒子也藉此感謝父母的養育。對一些人來說，這也是學習自律、負起責任的一段成長過程。'],
+  ['要出家多久？','傳統上，常配合雨季，在寺廟住大約三個月。現在，有人出家一週、十五天或一個月，依自己的時間安排，沒有每個人都相同的天數。結束後可以「還俗」，也就是恢復一般人的生活。'],
+  ['連國王也做過嗎？','有。例如，泰國的蒲美蓬國王，也稱為拉瑪九世，曾在一九五六年出家十五天，學習佛法，也表達對父母的感謝。']
+ ],sources:[['Thailand Foundation：短期出家的傳統與時間','https://thailandfoundation.or.th/th/buat-nak-rituals-before-monkhood/'],['德國之聲：為什麼許多泰國男性短期出家','https://amp.dw.com/en/thailand-why-many-men-become-short-term-monks/a-66363802'],['泰國 KMUTT 大學圖書館：拉瑪九世出家十五天','https://www.lib.kmutt.ac.th/en/king-ramaix-chapter15/']]},
+ monarchy:{title:'泰國國王的地位與權力',summary:'泰國保留國王，也有憲法、國會和政府。國王有正式職權，也有實際的政治影響力。',parts:[
+  ['為什麼泰國會有國王？','泰國有很長的王室歷史。過去，國王掌握統治國家的大權。一九三二年，泰國改變政治制度，保留王室，但由憲法規定國王和政府的職責，這叫「君主立憲」。'],
+  ['國王的地位如何？','國王是「國家元首」，也就是在制度上代表國家的人。他在國家的歷史和宗教生活中有重要地位，許多泰國人民尊敬王室。憲法也賦予國王特殊的地位與保護。'],
+  ['誰處理國家的大小事？','日常國政主要由總理領導政府處理，國會負責制定法律。國王也有憲法規定的職權，例如依照程序，任命經眾議院同意的人選為總理。眾議院是國會的一部分。'],
+  ['他有實際的政治權力嗎？','有正式職權，也有重要影響力。王室與軍方的關係密切，對泰國政治有相當影響。因此，了解泰國時，要一起看憲法怎麼規定，以及王室、政府和軍方實際上怎麼互動。']
+ ],sources:[['泰國外交部：一九三二年的制度改變','https://www.mfa.go.th/en/page/complete-independence'],['泰國憲法譯本：第 3、6、158 條等','https://www.constituteproject.org/constitution/Thailand_2017?lang=en'],['自由之家：泰國國王的政治與軍事影響（2025 年報告）','https://freedomhouse.org/country/thailand/freedom-world/2025']]},
+ market:{title:'水上市場怎麼做生意？',summary:'以前，河道就像道路，小船就像運貨的車子。水上市場和水邊居民的生活有密切關係。',parts:[
+  ['為什麼市場會在水上？','泰國中部有許多河流和運河。以前，很多人住在水邊，利用船隻出門、運送農產品。大家把東西載到河道交會或人多的地方買賣，慢慢形成水上市場。'],
+  ['賣東西的人怎麼賣？','有些攤販把水果、蔬菜和食物放在小船上，把船當成攤位；有些甚至在船上煮食物。水邊也有店家和攤位，所以水上市場不只有船。'],
+  ['買東西的人怎麼買？','顧客可以在岸邊逛，也可以搭船靠近攤販。看好東西、問清楚價錢後，再付款、拿商品。例如，船靠近賣水果的攤販，就可以買一袋水果。'],
+  ['有什麼特色？','船隻來來往往，船上有各種食物，岸邊有店家，買東西也像在認識水邊的生活。現在，有些水上市場也吸引許多旅客。各市場的時間不同，有的清早熱鬧，有的傍晚才熱鬧；不是全部都在清晨五點開市。']
+ ],sources:[['泰國觀光局：丹嫩莎朵水上市場的由來','https://www.tourismthailand.org/Attraction/damnoen-saduak-floating-market'],['泰國觀光局：早市與晚市的不同風貌','https://www.tourismthailand.org/Articles/floating-market-en'],['泰國觀光目錄：搭船逛水上市場','https://www.thailandtourismdirectory.go.th/en/attraction/1358']]}
+};
 // Fixed textbook annotations, separate from the teacher's editable ink.
 const studyKinds={rhetoric:{label:'修辭　類疊'},cause:{label:'句型　因果'}};
 const studyMarks=[
@@ -223,7 +258,18 @@ const moeSources=terms=>terms.map(t=>['萌典：'+t,'https://www.moedict.tw/'+t]
 function sourceMarkup(sources,caption='資料來源（介紹已改寫）'){
  return `<details class="lesson9-note-sources"><summary>${caption}</summary><ul>${sources.map(([label,url])=>`<li><a href="${escapeHTML(url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(label)}</a></li>`).join('')}</ul></details>`;
 }
+function readingLinkMarkup(tokenId){
+ return readingLinks.filter(link=>readingLinkAnchor(link)===tokenId).map(link=>{
+  const label=link.kind==='video'?'影片':'知識',description=`${label}：${link.title}${link.kind==='video'?'（另開新分頁）':''}`;
+  const common=`class="lesson9-reading-link ${link.kind}" data-reading-link="${link.id}" aria-label="${escapeHTML(description)}" title="${escapeHTML(description)}"`;
+  return link.kind==='video'?`<a ${common} href="${escapeHTML(link.href)}" target="_blank" rel="noopener noreferrer">${label}</a>`:`<button type="button" ${common} data-lesson9-note="${link.id}" aria-haspopup="dialog">${label}</button>`;
+ }).join('');
+}
 function noteContent(id){
+ if(id.startsWith('knowledge-')){
+  const n=knowledgeNotes[id.slice('knowledge-'.length)];if(!n)return null;
+  return {category:'延伸知識',title:n.title,html:`<p class="takeaway">${n.summary}</p>${n.parts.map(([heading,text])=>`<h3>${heading}</h3><p>${text}</p>`).join('')}${sourceMarkup(n.sources)}`};
+ }
  if(id.startsWith('word-')){
   const w=words.find(w=>id==='word-'+w.id);if(!w)return null;
   return {category:'認識詞語',title:w.term,html:`<p class="lesson9-pronunciation">${w.sound}</p><h3>課文中的意思</h3><p class="takeaway">${w.meaning}</p><h3>一起讀例句</h3>${w.examples.map((s,i)=>`<p class="lesson9-example"><span>${i+1}.</span> ${s}</p>`).join('')}${sourceMarkup(moeSources(w.lookup),'字義查考：萌典；例句為自編')}`};
@@ -276,7 +322,7 @@ function layout(anchor){
    const w=words.find(w=>w.id===t.word),g=glyphs.find(g=>g.id===t.glyph);
    const char=w?`<button class="flow-char learning-word" data-lesson9-note="word-${w.id}" aria-label="${w.term}：字義與例句" aria-haspopup="dialog" ${t.wordStart?'':'tabindex="-1"'}>${t.char}</button>`:`<span class="flow-char">${t.char}</span>`;
    const arrow=g?`<button class="lesson9-red-arrow" data-lesson9-note="glyph-${g.id}" aria-label="${g.target}：${g.kind}" aria-haspopup="dialog" title="${g.target}：${g.kind}"><svg viewBox="0 0 32 28" aria-hidden="true"><path d="M2 10h15V3l13 11-13 11v-7H2z"/></svg></button>`:'';
-   return `<span class="lesson9-cell flow-cell" style="${style}" data-token="${t.id}">${char}${arrow}</span>`;
+   return `<span class="lesson9-cell flow-cell" style="${style}" data-token="${t.id}">${char}${arrow}${readingLinkMarkup(t.id)}</span>`;
   }
   return `<span class="lesson9-cell ${t.type==='indent'?'flow-indent':'flow-number-slot'}" data-token="${t.id}" style="${style}" ${t.type==='indent'?'aria-label="段首空兩個全型字"':''}><span class="inline-number" aria-label="課本第${t.number}行">${t.number}</span>${t.type==='indent'?`<span class="flow-paragraph-label">第${numerals[t.p]}段</span>`:''}</span>`;
  }).join('');
@@ -295,6 +341,6 @@ function layout(anchor){
  if(anchor)history.replaceState(history.state,'','#lesson9-text-'+(index+1));
  lessonInk.refresh();return index+1;
 }
-const api={sections,countries,words,glyphs,pictureNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
+const api={sections,countries,words,glyphs,pictureNotes,readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else window.lesson9=api;
 })();
