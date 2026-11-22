@@ -9,7 +9,8 @@ const NOTE9_IDS=[
  ...['buddha','thailand','temple','splendid','monk','stroll','dealings','egypt','nile','lowland','dike','tulip','atmosphere','rowing'].map(id=>'l9-word-'+id),
  ...['buddha','terrain','prevent','dike','row','egypt','thai','stroll','tide','hua'].map(id=>'l9-glyph-'+id),
  ...[3,4,3,4].flatMap((count,p)=>Array.from({length:count},(_,i)=>`l9-picture-${p}-${i}`)),
- ...['monkhood','monarchy','market'].map(id=>'l9-knowledge-'+id)
+ ...['monkhood','monarchy','market'].map(id=>'l9-knowledge-'+id),
+ ...['dike','nomination','heading','appearance','atmosphere','cause','purpose'].map(id=>'l9-practice-'+id)
 ];
 const MAX_POINTS=150000, MAX_BYTES=12*1024*1024;
 const clone=value=>JSON.parse(JSON.stringify(value));
@@ -30,7 +31,7 @@ function validate(raw){
    if(!s||!(s.tool==='highlight'?HIGHLIGHT_COLORS:COLORS).includes(s.color)||![3,6,10].includes(s.width)||!['pen','line','highlight'].includes(s.tool)||!Array.isArray(s.points)||s.points.length<1||s.points.length>12000)throw Error('筆跡資料不完整。');
    count+=s.points.length;if(count>MAX_POINTS)throw Error('筆記太大，請分成不同檔案保存。');
    const points=s.points.map(p=>{
-    const pattern=key==='lesson8'?/^p[0-4]-l\d{1,2}-c\d{1,3}$/:key==='lesson9'?/^p[0-3]-(?:l\d{1,2}-(?:c\d{1,3}|indent|number)|image[0-3])$/:/^b\d{1,3}$/;
+    const pattern=key==='lesson8'?/^p[0-4]-l\d{1,2}-c\d{1,3}$/:key==='lesson9'?/^(?:p[0-3]-(?:l\d{1,2}-(?:c\d{1,3}|indent|number)|image[0-3])|s[2-4]-i[0-2]-l[01]-c\d{1,3})$/:/^b\d{1,3}$/;
     if(!p||typeof p.a!=='string'||!pattern.test(p.a)||![p.x,p.y].every(v=>Number.isFinite(v)&&Math.abs(v)<=30))throw Error('筆跡座標不正確。');
     return {a:p.a,x:p.x,y:p.y};
    });
@@ -208,7 +209,7 @@ function pinStroke(stroke,anchors){
  if(r.w>100000||r.h>100000||points.some(p=>Math.abs(p.x)>30||Math.abs(p.y)>30))return;
  // Text glyphs keep their size when extra row spacing changes. Use their
  // cell origin; on a resizable picture or note block keep the relative center.
- const glyph=/^p\d+-l\d+-c\d+$/.test(center.a);
+ const glyph=/^(?:p\d+|s[2-4]-i[0-2])-l\d+-c\d+$/.test(center.a);
  stroke.points=points;stroke.frame={x:glyph?0:center.x,y:glyph?0:center.y,w:r.w,h:r.h};
 }
 function pathData(stroke){

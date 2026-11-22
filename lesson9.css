@@ -71,3 +71,26 @@
 [data-lesson-menu]{font-weight:700}
 @media(max-width:900px){.lesson9-menu{grid-template-columns:1fr 1fr;gap:14px}.lesson9-menu .card{padding:20px;min-height:185px}.lesson9-source{font-size:15px}}
 @media(max-width:600px){.lesson9-menu{grid-template-columns:1fr}.lesson9-card-icon{font-size:42px}.country-gallery-title{font-size:19px}.country-picture figcaption{font-size:14px}.country-pictures{gap:5px}.lesson9-source{display:none}}
+.lesson9-practice-toolbar{flex-wrap:wrap}
+.lesson9-practice-toolbar p{margin:0 auto 0 0;font-size:clamp(17px,1.65vw,30px);color:#364d40}
+.reading-mode .practice-note-link{min-height:44px;border:1.5px solid #15574c;background:#edf7f0;color:#15574c;font:inherit;font-size:clamp(19px,1.4vw,27px)}
+.practice-note-link:hover,.practice-note-link:focus-visible{background:#d6eadd}
+.lesson9-practice .flow-char{font-family:var(--font-kai);font-weight:400}
+.lesson9-practice .practice-heading{color:#15574c}
+.lesson9-practice .practice-heading .flow-char{background:#edf5ee;border-radius:8px}
+.lesson9-practice .practice-term{color:#005ead}
+.lesson9-practice[data-practice="words"] .practice-term.term-1{color:#76415c}
+.lesson9-practice[data-practice="words"] .practice-heading.term-1 .flow-char{background:#f5e9ed}
+.lesson9-practice[data-practice="revise"] .practice-term .flow-char{color:#a42a24;background:#fff1ed;box-shadow:inset 0 0 0 2px #bb3f34;border-radius:8px}
+.practice-zhuyin{position:absolute;inset:4px auto auto -25px;color:#005ead;font:24px/1.05 var(--font-kai);writing-mode:vertical-rl;text-orientation:upright}
+.practice-picture{position:absolute;left:0;margin:0;padding:12px;box-sizing:border-box;display:grid;place-items:center}
+.practice-picture.side{top:0;height:100%}
+.practice-picture.bottom{bottom:0;width:100%}
+.practice-picture img{display:block;max-width:100%;max-height:100%;object-fit:contain;border-radius:10px;image-rendering:auto}
+.practice-picture.side img{max-height:min(70dvh,310px)}
+.practice-picture.bottom img{max-height:88px}
+@media(max-width:700px){.lesson9-practice-toolbar{gap:6px 10px}}
+.practice-item-label{margin-inline-start:.6em;color:#65776b;font-size:.74em}
+.practice-picture img{width:100%;height:100%}
+.practice-picture img[src$="word-mascot.webp"]{width:min(100%,150px)}
+.practice-picture img[src$="dike.webp"],.practice-picture img[src$="nomination.webp"],.practice-picture img[src$="heading.webp"]{width:min(100%,230px)}

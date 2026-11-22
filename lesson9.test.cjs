@@ -103,3 +103,35 @@ for(const [w,h] of [[1363,938],[1660,930],[1200,740],[980,620],[600,500],[240,54
  }
 }
 console.log('PASS: 4 exact new-tab video links, 3 sourced knowledge dialogs, stable text anchors, popup note round-trips and badge bounds');
+
+const lesson9 = require('./lesson9.js');
+const { practice, practicePages, practiceReader } = lesson9;
+for (const [id, section] of Object.entries(practice)) {
+ assert.match(lesson9.catalogue(), new RegExp('#lesson9-'+id+'-1'));
+ assert.ok(practiceReader(id).includes(section.prompt));
+ const anchors = [];
+ for (const [width,height] of [[1800,930],[1200,760],[265,600],[230,280]]) {
+  const pages = practicePages(id,width,height);
+  const tokens = pages.flatMap(page => page.cols.flat());
+  assert.equal(new Set(tokens.map(t=>t.id)).size,tokens.length);
+  if (!anchors.length) anchors.push(...tokens.map(t=>t.id));
+  assert.deepEqual(tokens.map(t=>t.id),anchors);
+  for(const item of section.items){
+   const key='practice-'+item.id;
+   const note=lesson9.noteContent(key);
+   assert.equal(note.title,item.title);
+   const itemTokens=pages.filter(page=>page.item===item).flatMap(page=>page.cols.flat());
+   assert.equal(itemTokens.map(t=>t.char).join(''),(item.heading||'')+item.sentence);
+   assert.equal(itemTokens.filter(t=>t.term>=0).map(t=>t.char).join('').includes(item.targets.at(-1)),true);
+   if(item.answer)assert.ok(note.html.includes(item.answer));
+   assert.ok(require('node:fs').existsSync(require('node:path').join(__dirname,'lesson9-'+item.image+'.webp')));
+   const stroke={tool:'pen',color:'#c43d32',width:3,points:[{a:itemTokens[0].id,x:.5,y:.5}]};
+   const book={...sample,surfaces:{lesson9:[stroke],['note:l9-'+key]:[{
+    ...stroke,points:[{a:'b0',x:.5,y:.5}]
+   }]}};
+   assert.deepEqual(validate(book),book);
+  }
+ }
+}
+assert.equal(lesson9.noteContent('practice-unknown'),null);
+console.log('PASS: seven practice items, responsive pagination, stable handwriting anchors, illustrations and note round-trips');

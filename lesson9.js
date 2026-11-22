@@ -5,10 +5,52 @@ const FONT=85, BLUE='#005ead';
 const sections=[
  {id:'text',title:'課文',icon:'▤',description:'請到我的家鄉來',ready:true},
  {id:'write',title:'我會寫字',icon:'✎',description:'準備中'},
- {id:'recognize',title:'我會認字',icon:'字',description:'準備中'},
- {id:'words',title:'認識詞語',icon:'詞',description:'準備中'},
- {id:'revise',title:'我會修改句子',icon:'改',description:'準備中'}
+ {id:'recognize',title:'我會認字',icon:'字',description:'比較堤、提、題',ready:true},
+ {id:'words',title:'認識詞語',icon:'詞',description:'兩組反義詞',ready:true},
+ {id:'revise',title:'我會修改句子',icon:'改',description:'找出用錯的詞',ready:true}
 ];
+const practice = {
+ recognize: {
+  prompt: '比一比，堤、提、題哪裡不一樣？',
+  items: [
+   {id:'dike', label:'堤', heading:'堤　築堤、河堤', gloss:'ㄊㄧˊ', targets:['堤','河堤'], sentence:'為了修築河堤，卡車運來大量土石。',
+    image:'dike', alt:'挖土機和卡車在水邊運送土石', link:'認字妙招', title:'土字旁的「堤」',
+    parts:[['看部首','「堤」左邊是「土」。早期常用泥土或石塊築堤擋水，看到「河堤」，可以想想河邊擋水的那道土坡。'],['比一比','堤、提、題在這裡都念ㄊㄧˊ。請用手指指出「堤」的土字旁，再說出一個含有「堤」的詞。']],
+    sources:[['教育部《國語辭典簡編本》：堤','https://dict.concised.moe.edu.tw/dictView.jsp?ID=10697&la=0&powerMode=0']]},
+   {id:'nomination', label:'提', heading:'提　提名、提早', gloss:'ㄊㄧˊ', targets:['提','提名'], sentence:'班上要選出這學期的模範生，我舉手提名李育興。',
+    image:'nomination', alt:'兩位學生在教室舉手', link:'認字妙招', title:'手部的「提」',
+    parts:[['用動作記住字形','「提」有提手旁。先做出用手提書袋的動作，再找出「提」左邊和手有關的部件。'],['用詞語記住意思','「提名」是提出人選給大家考慮。「提早」是把時間往前移。早上原定八點出發，改成七點半，就是提早出發。']]},
+   {id:'heading', label:'題', heading:'題　題目、標題', gloss:'ㄊㄧˊ', targets:['題','標題'], sentence:'這本書的每一頁都有醒目的標題，幫助我們閱讀時掌握重點。',
+    image:'heading', alt:'一本攤開的書，頁面有醒目的標題', link:'認字妙招', title:'右邊有「頁」的「題」',
+    parts:[['找部件','「題」右邊有個「頁」。可以用「翻開書頁找標題」這句話幫自己記住字形。'],['從課本找例子','請找出這一課的課名，再找出數學習作上的一道題目。標題告訴你內容大概在說什麼，題目則告訴你要回答什麼。']]}
+  ]
+ },
+ words: {
+  prompt: '念一念，每組詞語有什麼不同？',
+  items: [
+   {id:'appearance', label:'華麗、樸素', heading:'華麗、樸素', targets:['華麗','樸素'], sentence:'這家店販售各類服飾，有華麗珍貴的飾品，也有樸素雅緻的服裝。',
+    image:'word-mascot', alt:'捧著書的課本吉祥物', link:'詞義比較', title:'華麗和樸素',
+    parts:[['看外表','「華麗」形容外表亮眼、有許多裝飾。「樸素」形容外表簡單大方。'],['請學生說說看','一件上衣縫著閃亮的亮片，另一件上衣是素色的。你會用哪個詞形容它們？你是從哪裡看出來的？'],['反義詞有什麼用？','把意思相反的詞放在一起比較，能把事物的特點說得更清楚。']]},
+   {id:'atmosphere', label:'清靜、熱鬧', heading:'清靜、熱鬧', targets:['清靜','熱鬧'], sentence:'你想去清靜幽雅的鄉村度假，還是造訪熱鬧繁華的都市？',
+    image:'city-and-village', alt:'左邊是高樓林立的都市，右邊是田野和房屋', link:'詞義比較', title:'清靜和熱鬧',
+    parts:[['聽聲音、看人群','「清靜」讓人感覺安靜、少受打擾。「熱鬧」常是人多、聲音多，活動也多。'],['換個情境試試','閱讀時間的圖書館很清靜。下課時的操場很熱鬧。同一個地方也會改變，像是平日清靜的廟埕，廟會那天可能很熱鬧。']],
+    sources:[['教育部《國語辭典簡編本》：清靜','https://dict.concised.moe.edu.tw/dictView.jsp?ID=25619'],['教育部《國語辭典簡編本》：熱鬧','https://dict.concised.moe.edu.tw/dictView.jsp?ID=35928']] }
+  ]
+ },
+ revise: {
+  prompt: '紅框裡的詞用錯了，想一想為什麼。',
+  items: [
+   {id:'cause', label:'第一題', targets:['然後'], sentence:'荷蘭的國土有三分之一在海平面之下，然後要築堤防潮。',
+    answer:'荷蘭的國土有三分之一在海平面之下，所以要築堤防潮。',
+    image:'windmills', alt:'荷蘭水岸的風車、房屋和鬱金香', link:'看訂正', title:'把「然後」改成「所以」',
+    parts:[['先問為什麼','為什麼要築堤防潮？因為有些國土在海平面之下。前半句是原因，後半句是因此採取的做法，可以用「所以」接起來。'],['想想「然後」何時用','「然後」適合說順序。例如「我先打開課本，然後翻到第九課。」']]},
+   {id:'purpose', label:'第二題', targets:['只有'], sentence:'風車就是當初只有排水出海而建造的。',
+    answer:'風車就是當初為了排水出海而建造的。',
+    image:'windmills', alt:'荷蘭水岸的風車、房屋和鬱金香', link:'看訂正', title:'把「只有」改成「為了」',
+    parts:[['找出目的','當初建造風車想做什麼？想把水排到海裡。要說明做這件事的目的，可以用「為了」。'],['想想「只有」何時用','「只有」表示限定。例如「書包裡只有一本書」。換你用「為了……而……」說一個句子。']]}
+  ]
+ }
+};
 const countries=[
  {name:'泰國',page:94,lines:[
   '請到我的家鄉來，我的家鄉是「千',
@@ -266,6 +308,13 @@ function readingLinkMarkup(tokenId){
  }).join('');
 }
 function noteContent(id){
+ if(id.startsWith('practice-')){
+  const item=Object.values(practice).flatMap(section=>section.items).find(item=>'practice-'+item.id===id);
+  if(!item)return null;
+  const answer=item.answer?`<p class="takeaway">${escapeHTML(item.answer)}</p>`:'';
+  const explanation=item.parts.map(([heading,body])=>`<h3>${escapeHTML(heading)}</h3><p>${escapeHTML(body)}</p>`).join('');
+  return {category:item.link,title:item.title,html:answer+explanation+(item.sources?sourceMarkup(item.sources,'字義查考：教育部《國語辭典簡編本》'):'')};
+ }
  if(id.startsWith('knowledge-')){
   const n=knowledgeNotes[id.slice('knowledge-'.length)];if(!n)return null;
   return {category:'延伸知識',title:n.title,html:`<p class="takeaway">${n.summary}</p>${n.parts.map(([heading,text])=>`<h3>${heading}</h3><p>${text}</p>`).join('')}${sourceMarkup(n.sources)}`};
@@ -299,8 +348,9 @@ function openLessonNote(id,opener){
  const content=noteContent(id);if(!content)return;
  const dialog=document.getElementById('lesson-note');lessonInk.beforeChange();noteOpener=opener;
  dialog.dataset.note='l9-'+id;dialog.dataset.lesson9Note=id;dialog.classList.add('lesson9-note');
- const close=side=>`<div class="note-controls note-controls-${side}"><button class="note-close" data-lesson9-close aria-label="${side==='left'?'左':'右'}側關閉解說，返回課文" title="關閉解說，返回課文"><span aria-hidden="true">×</span></button></div>`;
- dialog.innerHTML=`<div class="note-header"><p>老師補充</p></div><div class="note-middle"><nav class="note-tools" data-ink-side="left" aria-label="解說左側畫筆工具"></nav><div class="note-content" tabindex="0" role="region" aria-label="解說內容，可上下捲動"><div class="note-paper"><p class="kicker">${content.category}</p><h1 id="note-title">${content.title}</h1><div class="board">${content.html}</div></div></div><nav class="note-tools" data-ink-side="right" aria-label="解說右側畫筆工具"></nav></div><div class="note-footer">${close('left')}<span class="lesson9-return-hint">關閉後，回到原來的課文</span>${close('right')}</div>`;
+ const destination=opener.classList.contains('practice-note-link')?'練習':'課文';
+ const close=side=>`<div class="note-controls note-controls-${side}"><button class="note-close" data-lesson9-close aria-label="${side==='left'?'左':'右'}側關閉解說，返回${destination}" title="關閉解說，返回${destination}"><span aria-hidden="true">×</span></button></div>`;
+ dialog.innerHTML=`<div class="note-header"><p>老師補充</p></div><div class="note-middle"><nav class="note-tools" data-ink-side="left" aria-label="解說左側畫筆工具"></nav><div class="note-content" tabindex="0" role="region" aria-label="解說內容，可上下捲動"><div class="note-paper"><p class="kicker">${content.category}</p><h1 id="note-title">${content.title}</h1><div class="board">${content.html}</div></div></div><nav class="note-tools" data-ink-side="right" aria-label="解說右側畫筆工具"></nav></div><div class="note-footer">${close('left')}<span class="lesson9-return-hint">關閉後，回到原來的${destination}</span>${close('right')}</div>`;
  dialog.querySelectorAll('[data-lesson9-close]').forEach(b=>b.onclick=closeLessonNote);
  if(!dialog.open)dialog.showModal();dialog.querySelector('.note-content').scrollTop=0;lessonInk.refresh();
  dialog.querySelector('[data-lesson9-close]').focus({preventScroll:true});
@@ -313,6 +363,79 @@ if(typeof document!=='undefined'){
 }
 function catalogue(){return `<section class="lesson9-catalogue"><p class="kicker">第三單元・第九課</p><h1>請到我的家鄉來</h1><div class="lesson9-menu">${sections.map((s,i)=>`<a class="card ${s.ready?'current':''}" href="#lesson9-${s.id}${s.ready?'-1':''}"><span class="lesson9-card-icon" aria-hidden="true">${s.icon}</span><span class="number">0${i+1}</span><h2>${s.title}</h2><p>${s.description}${s.ready?' →':''}</p></a>`).join('')}</div></section>`}
 function placeholder(id){const s=sections.find(s=>s.id===id);return s?`<p class="kicker">第九課・請到我的家鄉來</p><h1>${s.title}</h1><div class="empty"><p>這個部分準備中。</p></div><a class="button" href="#lesson9">回第九課目錄</a>`:catalogue()}
+function practiceReader(id){
+ const section=sections.find(section=>section.id===id);
+ return `<div class="reading-toolbar lesson9-practice-toolbar"><h1>${section.title}${id==='revise'?'<span class="practice-item-label"></span>':''}</h1><p>${practice[id].prompt}</p><button type="button" class="practice-note-link" data-lesson9-note aria-haspopup="dialog"></button></div><div class="continuous-board lesson9-board lesson9-practice" data-practice="${id}" aria-label="${section.title}，從右到左直排"></div><nav class="reading-pager" aria-label="練習翻頁"><span id="reading-count" class="small" aria-live="polite"></span></nav>`;
+}
+function practicePages(id,width,height){
+ const pages=[];
+ const sideImage=width>=620;
+ const bottomImage=!sideImage&&height>=370;
+ const imageWidth=sideImage?Math.min(320,Math.round(width*.24)):0;
+ const imageHeight=bottomImage?112:0;
+ const pitch=FONT*1.37,padding=12;
+ const rows=Math.max(1,Math.floor((height-imageHeight-2*padding)/FONT));
+ const columns=Math.max(1,Math.floor((width-imageWidth-2*padding)/pitch));
+ const sectionIndex=sections.findIndex(section=>section.id===id);
+ practice[id].items.forEach((item,itemIndex)=>{
+  const lines=item.heading?[item.heading,item.sentence]:[item.sentence];
+  const flow=lines.flatMap((line,lineIndex)=>{
+   const pattern=[...item.targets].sort((a,b)=>b.length-a.length).join('|');
+   const matches=[...line.matchAll(new RegExp(pattern,'g'))];
+   const text=[...line].map((char,i)=>{
+    const match=matches.find(match=>i>=match.index&&i<match.index+match[0].length);
+    return {char,id:`s${sectionIndex}-i${itemIndex}-l${lineIndex}-c${i}`, heading:!!item.heading&&lineIndex===0,
+     term:match?item.targets.indexOf(match[0]):-1, gloss:item.gloss&&lineIndex===0&&i===0?item.gloss:''};
+   });
+   const chunks=[];
+   for(let i=0;i<text.length;i+=rows)chunks.push(text.slice(i,i+rows));
+   return chunks;
+  });
+  for(let i=0;i<flow.length;i+=columns)pages.push({item,cols:flow.slice(i,i+columns),pitch,padding,imageWidth,imageHeight});
+ });
+ return pages;
+}
+function layoutPractice(anchor){
+ const board=document.querySelector('.lesson9-practice');
+ const id=board.dataset.practice;
+ const pages=practicePages(id,board.clientWidth,board.clientHeight);
+ const requested=(Number(location.hash.split('-')[2])||1)-1;
+ const anchored=anchor?pages.findIndex(page=>page.cols.some(col=>col.some(t=>t.id===anchor))):-1;
+ const index=anchored>=0?anchored:Math.max(0,Math.min(requested,pages.length-1));
+ const {item,cols,pitch,padding,imageWidth,imageHeight}=pages[index];
+ lessonInk.beforeChange();
+ board.innerHTML=cols.map((col,c)=>col.map((t,r)=>{
+  const where=`right:${padding+c*pitch}px;top:${padding+r*FONT}px;width:${FONT}px;height:${FONT}px`;
+  const classes=['lesson9-cell','flow-cell',t.heading?'practice-heading':'',t.term>=0?`practice-term term-${t.term}`:''].filter(Boolean).join(' ');
+  return `<span class="${classes}" style="${where}" data-token="${t.id}"><span class="flow-char">${escapeHTML(t.char)}</span>${t.gloss?`<span class="practice-zhuyin" aria-label="注音 ${t.gloss}">${t.gloss}</span>`:''}</span>`;
+ }).join('')).join('');
+ if(imageWidth||imageHeight){
+  const figure=document.createElement('figure');
+  figure.className=`practice-picture ${imageWidth?'side':'bottom'}`;
+  figure.style[imageWidth?'width':'height']=(imageWidth||imageHeight)+'px';
+  figure.innerHTML=`<img src="lesson9-${item.image}.webp" alt="${escapeHTML(item.alt)}">`;
+  board.append(figure);
+ }
+ if(id==='revise')document.querySelector('.practice-item-label').textContent=item.label;
+ const link=document.querySelector('.practice-note-link');
+ link.textContent=item.link;
+ link.dataset.lesson9Note='practice-'+item.id;
+ link.setAttribute('aria-label',`${item.link}：${item.label}`);
+ link.onclick=()=>openLessonNote(link.dataset.lesson9Note,link);
+ setLesson9Pager(id,index,pages.length);
+ if(anchor)history.replaceState(history.state,'',`#lesson9-${id}-${index+1}`);
+ lessonInk.refresh();
+ return index+1;
+}
+function setLesson9Pager(section,index,total){
+ document.getElementById('reading-count').textContent=`${index+1} / ${total}`;
+ for(const suffix of ['', '-right']){
+  const prev=document.getElementById('reading-prev'+suffix),next=document.getElementById('reading-next'+suffix);
+  prev.disabled=index===0;next.disabled=index===total-1;
+  prev.onclick=()=>location.hash=`lesson9-${section}-${index}`;
+  next.onclick=()=>location.hash=`lesson9-${section}-${index+2}`;
+ }
+}
 function reader(){return `<div class="reading-toolbar"><h1>請到我的家鄉來</h1><span class="lesson9-source">課本第94～97頁</span></div><div class="continuous-board lesson9-board" data-lesson="lesson9" aria-label="第九課課文，由右至左直排，藍色為本課語詞"></div><nav class="reading-pager" aria-label="課文翻頁"><span id="reading-count" class="small" aria-live="polite"></span></nav>`}
 function layout(anchor){
  const board=document.querySelector('.lesson9-board');if(!board)return;
@@ -337,15 +460,10 @@ function layout(anchor){
   figure.innerHTML=gallery(page.picture);board.append(figure);
  }
  board.onclick=event=>{const button=event.target.closest('[data-lesson9-note]');if(button)openLessonNote(button.dataset.lesson9Note,button)};
- document.getElementById('reading-count').textContent=`${index+1} / ${pages.length}`;
- for(const suffix of ['', '-right']){
-  const prev=document.getElementById('reading-prev'+suffix),next=document.getElementById('reading-next'+suffix);
-  prev.disabled=index===0;next.disabled=index===pages.length-1;
-  prev.onclick=()=>location.hash='lesson9-text-'+index;next.onclick=()=>location.hash='lesson9-text-'+(index+2);
- }
+ setLesson9Pager('text',index,pages.length);
  if(anchor)history.replaceState(history.state,'','#lesson9-text-'+(index+1));
  lessonInk.refresh();return index+1;
 }
-const api={sections,countries,words,glyphs,pictureNotes,readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
+const api={practice,practicePages,practiceReader,layoutPractice,sections,countries,words,glyphs,pictureNotes,readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else window.lesson9=api;
 })();
