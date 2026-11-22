@@ -403,14 +403,31 @@ function practicePages(id,width,height){
 function layoutPractice(anchor){
  const board=document.querySelector('.lesson9-practice');
  const id=board.dataset.practice;
- const pages=practicePages(id,board.clientWidth,board.clientHeight);
+ const fullWidth=board.clientWidth, height=board.clientHeight;
+ const items=practice[id].items;
+ // Reserve a strip beneath the text for each illustration and its note button.
+ const strip=140;
+ const groupWidth=Math.floor(fullWidth/items.length);
+ const gap=12;
+ const candidate=practicePages(id,fullWidth,height-strip);
+ const grouped=height>=500&&candidate.length===items.length&&candidate.every(page=>
+  page.cols.length*(FONT+gap)+24<=groupWidth);
+ const pages=grouped?candidate:practicePages(id,fullWidth,height);
  const requested=(Number(location.hash.split('-')[2])||1)-1;
  const anchored=anchor?pages.findIndex(page=>page.cols.some(col=>col.some(t=>t.id===anchor))):-1;
- const index=anchored>=0?anchored:Math.max(0,Math.min(requested,pages.length-1));
- const {item,cols,pitch,padding,imageWidth,imageHeight}=pages[index];
+ const index=grouped?0:anchored>=0?anchored:Math.max(0,Math.min(requested,pages.length-1));
  lessonInk.beforeChange();
- board.innerHTML=cols.map((col,c)=>col.map((t,r)=>{
-  const where=`right:${padding+c*pitch}px;top:${padding+r*FONT}px;width:${FONT}px;height:${FONT}px`;
+ board.replaceChildren();
+ const toolbarLink=document.querySelector('.practice-note-link');
+ toolbarLink.hidden=grouped;
+ const label=document.querySelector('.practice-item-label');
+ if(label)label.textContent=grouped?'':pages[index].item.label;
+ for(const [group,page] of (grouped?pages:[pages[index]]).entries()){
+ const {item,cols,pitch,padding,imageWidth,imageHeight}=page;
+ const columnPitch=grouped?Math.min(pitch,(groupWidth-24)/cols.length):pitch;
+ const offset=grouped?group*groupWidth:0;
+ board.insertAdjacentHTML('beforeend',cols.map((col,c)=>col.map((t,r)=>{
+  const where=`right:${offset+padding+c*columnPitch}px;top:${padding+r*FONT}px;width:${FONT}px;height:${FONT}px`;
   const sameTerm=other=>other?.term===t.term;
   const classes=['lesson9-cell','flow-cell',t.heading?'practice-heading':''];
   if(t.term>=0){
@@ -419,22 +436,29 @@ function layoutPractice(anchor){
    if(sameTerm(col[r+1]))classes.push('term-continues-to');
   }
   return `<span class="${classes.filter(Boolean).join(' ')}" style="${where}" data-token="${t.id}"><span class="flow-char">${escapeHTML(t.char)}</span>${t.gloss?`<span class="practice-zhuyin" aria-label="注音 ${t.gloss}">${t.gloss}</span>`:''}</span>`;
- }).join('')).join('');
+ }).join('')).join(''));
  if(imageWidth||imageHeight){
   const figure=document.createElement('figure');
   figure.className=`practice-picture ${imageWidth?'side':'bottom'}`;
   figure.style[imageWidth?'width':'height']=(imageWidth||imageHeight)+'px';
   figure.innerHTML=`<img src="lesson9-${item.image}.webp" alt="${escapeHTML(item.alt)}">`;
+  if(grouped)figure.style.cssText=`left:auto;right:${offset+8}px;top:auto;bottom:0;width:${groupWidth-16}px;height:${strip}px;border-top:1px solid #d7dfd1`;
+  if(grouped)figure.firstElementChild.style.cssText='height:100%;max-height:116px;width:54%';
   board.append(figure);
  }
- if(id==='revise')document.querySelector('.practice-item-label').textContent=item.label;
- const link=document.querySelector('.practice-note-link');
- link.textContent=item.link;
+ const link=grouped?toolbarLink.cloneNode(false):toolbarLink;
+ if(grouped){
+  link.hidden=false;
+  link.style.cssText=`position:absolute;right:${offset+12}px;bottom:12px;z-index:6`;
+  board.append(link);
+ }
+ link.textContent=grouped&&id==='revise'?item.label+'訂正':item.link;
  link.dataset.lesson9Note='practice-'+item.id;
  link.setAttribute('aria-label',`${item.link}：${item.label}`);
  link.onclick=()=>openLessonNote(link.dataset.lesson9Note,link);
- setLesson9Pager(id,index,pages.length);
- if(anchor)history.replaceState(history.state,'',`#lesson9-${id}-${index+1}`);
+ }
+ setLesson9Pager(id,index,grouped?1:pages.length);
+ if(anchor||(grouped&&requested>0))history.replaceState(history.state,'',`#lesson9-${id}-${index+1}`);
  lessonInk.refresh();
  return index+1;
 }
