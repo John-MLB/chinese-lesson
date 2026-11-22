@@ -365,7 +365,7 @@ function catalogue(){return `<section class="lesson9-catalogue"><p class="kicker
 function placeholder(id){const s=sections.find(s=>s.id===id);return s?`<p class="kicker">第九課・請到我的家鄉來</p><h1>${s.title}</h1><div class="empty"><p>這個部分準備中。</p></div><a class="button" href="#lesson9">回第九課目錄</a>`:catalogue()}
 function practiceReader(id){
  const section=sections.find(section=>section.id===id);
- return `<div class="reading-toolbar lesson9-practice-toolbar"><h1>${section.title}${id==='revise'?'<span class="practice-item-label"></span>':''}</h1><p>${practice[id].prompt}</p><button type="button" class="practice-note-link" data-lesson9-note aria-haspopup="dialog"></button></div><div class="continuous-board lesson9-board lesson9-practice" data-practice="${id}" aria-label="${section.title}，從右到左直排"></div><nav class="reading-pager" aria-label="練習翻頁"><span id="reading-count" class="small" aria-live="polite"></span></nav>`;
+ return `<div class="reading-toolbar lesson9-practice-toolbar"><h1>${section.title}${id==='revise'?'<span class="practice-item-label"></span>':''}</h1><button type="button" class="practice-note-link" data-lesson9-note aria-haspopup="dialog"></button></div><div class="continuous-board lesson9-board lesson9-practice" data-practice="${id}" aria-label="${section.title}，從右到左直排"><p class="practice-intro">${practice[id].prompt}</p></div><nav class="reading-pager" aria-label="練習翻頁"><span id="reading-count" class="small" aria-live="polite"></span></nav>`;
 }
 function practicePages(id,width,height){
  const pages=[];
@@ -403,7 +403,12 @@ function practicePages(id,width,height){
 function layoutPractice(anchor){
  const board=document.querySelector('.lesson9-practice');
  const id=board.dataset.practice;
- const fullWidth=board.clientWidth, height=board.clientHeight;
+ const intro=board.querySelector('.practice-intro');
+ const vertical=board.clientWidth>=700&&board.clientHeight>=480;
+ intro.classList.toggle('vertical',vertical);
+ const insetX=vertical?intro.offsetWidth:0;
+ const insetY=vertical?0:intro.offsetHeight;
+ const fullWidth=board.clientWidth-insetX, height=board.clientHeight-insetY;
  const items=practice[id].items;
  // Reserve a strip beneath the text for each illustration and its note button.
  const strip=140;
@@ -417,7 +422,7 @@ function layoutPractice(anchor){
  const anchored=anchor?pages.findIndex(page=>page.cols.some(col=>col.some(t=>t.id===anchor))):-1;
  const index=grouped?0:anchored>=0?anchored:Math.max(0,Math.min(requested,pages.length-1));
  lessonInk.beforeChange();
- board.replaceChildren();
+ board.replaceChildren(intro);
  const toolbarLink=document.querySelector('.practice-note-link');
  toolbarLink.hidden=grouped;
  const label=document.querySelector('.practice-item-label');
@@ -425,9 +430,9 @@ function layoutPractice(anchor){
  for(const [group,page] of (grouped?pages:[pages[index]]).entries()){
  const {item,cols,pitch,padding,imageWidth,imageHeight}=page;
  const columnPitch=grouped?Math.min(pitch,(groupWidth-24)/cols.length):pitch;
- const offset=grouped?group*groupWidth:0;
+ const offset=insetX+(grouped?group*groupWidth:0);
  board.insertAdjacentHTML('beforeend',cols.map((col,c)=>col.map((t,r)=>{
-  const where=`right:${offset+padding+c*columnPitch}px;top:${padding+r*FONT}px;width:${FONT}px;height:${FONT}px`;
+  const where=`right:${offset+padding+c*columnPitch}px;top:${insetY+padding+r*FONT}px;width:${FONT}px;height:${FONT}px`;
   const sameTerm=other=>other?.term===t.term;
   const classes=['lesson9-cell','flow-cell',t.heading?'practice-heading':''];
   if(t.term>=0){

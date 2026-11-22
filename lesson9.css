@@ -80,7 +80,6 @@
 .lesson9-practice .practice-heading .flow-char{background:#edf5ee;border-radius:8px}
 .lesson9-practice .practice-term{color:#005ead}
 .lesson9-practice[data-practice="words"] .practice-term.term-1{color:#76415c}
-.lesson9-practice[data-practice="words"] .practice-heading.term-1 .flow-char{background:#f5e9ed}
 .lesson9-practice[data-practice="revise"] .practice-term .flow-char{color:#a42a24;background:#fff1ed;box-sizing:border-box;border:2px solid #bb3f34;border-radius:8px}
 .practice-zhuyin{position:absolute;inset:4px auto auto -25px;color:#005ead;font:24px/1.05 var(--font-kai);writing-mode:vertical-rl;text-orientation:upright}
 .practice-picture{position:absolute;left:0;margin:0;padding:12px;box-sizing:border-box;display:grid;place-items:center}
@@ -97,3 +96,7 @@
 
 .lesson9-practice[data-practice="revise"] .term-continues-from .flow-char{border-top-color:transparent;border-top-left-radius:0;border-top-right-radius:0}
 .lesson9-practice[data-practice="revise"] .term-continues-to .flow-char{border-bottom-color:transparent;border-bottom-left-radius:0;border-bottom-right-radius:0}
+
+.lesson9-practice .practice-intro{position:absolute;z-index:1;inset:0 0 auto;margin:0;padding:8px 12px;box-sizing:border-box;background:#edf6ef;color:#174e40;font:700 clamp(25px,2.6vw,48px)/1.24 var(--font-kai);text-align:center}
+.lesson9-practice .practice-intro.vertical{inset:0 0 0 auto;writing-mode:vertical-rl;text-orientation:mixed;padding:14px 9px;text-align:start;border-left:1px solid #c7d9ca}
+.lesson9-practice[data-practice] .practice-heading .flow-char{background:linear-gradient(90deg,transparent 5%,#ffed66 5% 95%,transparent 95%);border-radius:0}
