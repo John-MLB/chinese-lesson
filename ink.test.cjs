@@ -69,3 +69,29 @@ assert.deepEqual([3,6,10].map(width=>strokeWidth({tool:'highlight',width})),[22,
 assert.equal(strokeWidth({tool:'pen',width:3}),3);
 assert.equal(strokeWidth({tool:'line',width:10}),10);
 console.log('PASS: old/new note format round-trip, highlight colors and width limits');
+
+const {pinStroke,resolve}=require('./ink.js');
+{
+ const anchors=new Map([['p0-l0-c0',{x:20,y:10,w:85,h:90}],['p0-l0-c1',{x:20,y:100,w:85,h:90}]]);
+ const stroke={tool:'pen',color:'#c43d32',width:3,points:[
+  {a:'p0-l0-c0',x:.2,y:.4},{a:'p0-l0-c1',x:.8,y:.1},{a:'p0-l0-c0',x:.2,y:.4}
+ ]};
+ const original=stroke.points.map(p=>resolve(p,anchors));
+ pinStroke(stroke,anchors);
+ const pinned=stroke.points[0].a;
+ assert.ok(stroke.points.every(p=>p.a===pinned));
+ const moved=new Map([[pinned,{x:170,y:225,w:85,h:98}]]);
+ for(const [i,p] of stroke.points.entries()){
+  const at=resolve(p,moved,stroke.frame),old=anchors.get(pinned);
+  assert.ok(Math.abs(at.x-(170+original[i].x-old.x))<1e-8);
+  assert.ok(Math.abs(at.y-(225+original[i].y-old.y))<1e-8);
+  assert.equal(resolve(p,new Map(),stroke.frame),null);
+ }
+ const fixture=mutate(v=>{v.surfaces.lesson8=[stroke]});
+ assert.deepEqual(validate(JSON.parse(JSON.stringify(fixture))),fixture);
+ const invalid=structuredClone(fixture);invalid.surfaces.lesson8[0].frame.w=-85;
+ assert.throws(()=>validate(invalid));
+ const mixed=structuredClone(fixture);mixed.surfaces.lesson8[0].points[0].a='p0-l1-c9';
+ assert.throws(()=>validate(mixed));
+}
+console.log('PASS: one circle follows its character across a column break, frame validation and reload');

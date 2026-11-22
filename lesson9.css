@@ -40,11 +40,11 @@
 .country-picture figcaption button{display:block;width:100%;padding:0;border:0;border-radius:0;font:inherit;line-height:inherit;color:inherit;background:transparent;text-align:center;touch-action:manipulation}
 .lesson9-picture-link:hover,.lesson9-picture-link:focus-visible{outline:3px solid #197c75;outline-offset:-3px}
 .country-picture figcaption button:hover{text-decoration:underline}
-#lesson-note.lesson9-note .note-content{overflow-y:scroll;scrollbar-gutter:stable;scrollbar-width:auto;scrollbar-color:#6c8b7d #eef1e8;touch-action:pan-y}
+#lesson-note.lesson9-note .note-content{overflow-y:scroll;scrollbar-gutter:stable;scrollbar-width:auto;scrollbar-color:#6c8b7d #eef1e8;touch-action:pan-y pinch-zoom}
 #lesson-note.lesson9-note .note-content::-webkit-scrollbar{width:18px}
 #lesson-note.lesson9-note .note-content::-webkit-scrollbar-thumb{background:#6c8b7d;border:4px solid #eef1e8;border-radius:10px}
 #lesson-note.lesson9-note .note-content::-webkit-scrollbar-track{background:#eef1e8}
-.lesson9-note .note-paper{touch-action:pan-y}
+.lesson9-note .note-paper{touch-action:pan-y pinch-zoom}
 .lesson9-note .board{font-size:clamp(30px,2.7vw,70px);line-height:1.65}
 .lesson9-note .board h3{font-size:1em;color:var(--green);margin:1em 0 .35em}
 .lesson9-note .board p{margin:.55em 0}

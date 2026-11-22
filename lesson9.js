@@ -288,7 +288,12 @@ let noteOpener=null;
 function closeLessonNote(){
  const dialog=document.getElementById('lesson-note');if(!dialog.dataset.lesson9Note)return;
  lessonInk.beforeChange();dialog.close();dialog.classList.remove('lesson9-note');delete dialog.dataset.lesson9Note;
- lessonInk.refresh();if(noteOpener?.isConnected)noteOpener.focus({preventScroll:true});noteOpener=null;
+ const token=noteOpener?.closest('[data-token]')?.dataset.token;
+ const id=noteOpener?.dataset.lesson9Note;
+ resizeReading(token);
+ lessonInk.refresh();
+ const opener=noteOpener?.isConnected?noteOpener:document.querySelector(`[data-token="${token}"] [data-lesson9-note="${id}"]`);
+ opener?.focus({preventScroll:true});noteOpener=null;
 }
 function openLessonNote(id,opener){
  const content=noteContent(id);if(!content)return;
