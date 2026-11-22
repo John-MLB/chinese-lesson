@@ -400,6 +400,12 @@ function practicePages(id,width,height){
  });
  return pages;
 }
+function practicePronunciation(gloss){
+ if(!gloss)return '';
+ if(gloss!=='ㄊㄧˊ')return `<span class="practice-zhuyin">${escapeHTML(gloss)}</span>`;
+ // Two 24px phonetic cells. Center the rising stroke on their shared edge.
+ return `<span class="practice-zhuyin" role="img" aria-label="注音 ㄊㄧˊ" style="top:50%;transform:translateY(-50%);width:28px;height:48px;writing-mode:horizontal-tb;line-height:24px"><span aria-hidden="true" style="display:block;width:24px;text-align:center">ㄊ<br>ㄧ</span><svg aria-hidden="true" viewBox="0 0 8 10" style="position:absolute;left:20px;top:19px;width:8px;height:10px"><path d="M1.5 8.5 L6.5 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></span>`;
+}
 function layoutPractice(anchor){
  const board=document.querySelector('.lesson9-practice');
  const id=board.dataset.practice;
@@ -440,7 +446,7 @@ function layoutPractice(anchor){
    if(sameTerm(col[r-1]))classes.push('term-continues-from');
    if(sameTerm(col[r+1]))classes.push('term-continues-to');
   }
-  return `<span class="${classes.filter(Boolean).join(' ')}" style="${where}" data-token="${t.id}"><span class="flow-char">${escapeHTML(t.char)}</span>${t.gloss?`<span class="practice-zhuyin" aria-label="注音 ${t.gloss}">${t.gloss}</span>`:''}</span>`;
+  return `<span class="${classes.filter(Boolean).join(' ')}" style="${where}" data-token="${t.id}"><span class="flow-char">${escapeHTML(t.char)}</span>${practicePronunciation(t.gloss)}</span>`;
  }).join('')).join(''));
  if(imageWidth||imageHeight){
   const figure=document.createElement('figure');
