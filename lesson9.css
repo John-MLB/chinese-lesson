@@ -81,7 +81,9 @@
 .lesson9-practice .practice-term{color:#005ead}
 .lesson9-practice[data-practice="words"] .practice-term.term-1{color:#76415c}
 .lesson9-practice[data-practice="revise"] .practice-term .flow-char{color:#a42a24;background:#fff1ed;box-sizing:border-box;border:2px solid #bb3f34;border-radius:8px}
-.practice-zhuyin{position:absolute;inset:4px auto auto -25px;color:#005ead;font:24px/1.05 var(--font-kai);writing-mode:vertical-rl;text-orientation:upright}
+/* Leave room on the right of the first column for its vertical pronunciation. */
+.lesson9-practice[data-practice="recognize"] .flow-cell{transform:translateX(-18px)}
+.practice-zhuyin{position:absolute;inset:4px auto auto calc(100% + 2px);color:#005ead;font:24px/1.05 var(--font-kai);writing-mode:vertical-rl;text-orientation:upright}
 .practice-picture{position:absolute;left:0;margin:0;padding:12px;box-sizing:border-box;display:grid;place-items:center}
 .practice-picture.side{top:0;height:100%}
 .practice-picture.bottom{bottom:0;width:100%}
