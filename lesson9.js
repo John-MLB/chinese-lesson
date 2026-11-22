@@ -388,7 +388,12 @@ function practicePages(id,width,height){
      term:match?item.targets.indexOf(match[0]):-1, gloss:item.gloss&&lineIndex===0&&i===0?item.gloss:''};
    });
    const chunks=[];
-   for(let i=0;i<text.length;i+=rows)chunks.push(text.slice(i,i+rows));
+   for(let start=0;start<text.length;){
+    let end=Math.min(text.length,start+rows);
+    if(end-start>1&&/[、。，？]/.test(text[end]?.char||''))end--;
+    chunks.push(text.slice(start,end));
+    start=end;
+   }
    return chunks;
   });
   for(let i=0;i<flow.length;i+=columns)pages.push({item,cols:flow.slice(i,i+columns),pitch,padding,imageWidth,imageHeight});
@@ -406,8 +411,14 @@ function layoutPractice(anchor){
  lessonInk.beforeChange();
  board.innerHTML=cols.map((col,c)=>col.map((t,r)=>{
   const where=`right:${padding+c*pitch}px;top:${padding+r*FONT}px;width:${FONT}px;height:${FONT}px`;
-  const classes=['lesson9-cell','flow-cell',t.heading?'practice-heading':'',t.term>=0?`practice-term term-${t.term}`:''].filter(Boolean).join(' ');
-  return `<span class="${classes}" style="${where}" data-token="${t.id}"><span class="flow-char">${escapeHTML(t.char)}</span>${t.gloss?`<span class="practice-zhuyin" aria-label="注音 ${t.gloss}">${t.gloss}</span>`:''}</span>`;
+  const sameTerm=other=>other?.term===t.term;
+  const classes=['lesson9-cell','flow-cell',t.heading?'practice-heading':''];
+  if(t.term>=0){
+   classes.push('practice-term',`term-${t.term}`);
+   if(sameTerm(col[r-1]))classes.push('term-continues-from');
+   if(sameTerm(col[r+1]))classes.push('term-continues-to');
+  }
+  return `<span class="${classes.filter(Boolean).join(' ')}" style="${where}" data-token="${t.id}"><span class="flow-char">${escapeHTML(t.char)}</span>${t.gloss?`<span class="practice-zhuyin" aria-label="注音 ${t.gloss}">${t.gloss}</span>`:''}</span>`;
  }).join('')).join('');
  if(imageWidth||imageHeight){
   const figure=document.createElement('figure');

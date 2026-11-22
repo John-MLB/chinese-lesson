@@ -113,6 +113,7 @@ for (const [id, section] of Object.entries(practice)) {
  for (const [width,height] of [[1800,930],[1200,760],[265,600],[230,280]]) {
   const pages = practicePages(id,width,height);
   const tokens = pages.flatMap(page => page.cols.flat());
+  assert.ok(pages.every(page=>page.cols.every(col=>!/[、。，？]/.test(col[0].char))));
   assert.equal(new Set(tokens.map(t=>t.id)).size,tokens.length);
   if (!anchors.length) anchors.push(...tokens.map(t=>t.id));
   assert.deepEqual(tokens.map(t=>t.id),anchors);

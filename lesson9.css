@@ -81,7 +81,7 @@
 .lesson9-practice .practice-term{color:#005ead}
 .lesson9-practice[data-practice="words"] .practice-term.term-1{color:#76415c}
 .lesson9-practice[data-practice="words"] .practice-heading.term-1 .flow-char{background:#f5e9ed}
-.lesson9-practice[data-practice="revise"] .practice-term .flow-char{color:#a42a24;background:#fff1ed;box-shadow:inset 0 0 0 2px #bb3f34;border-radius:8px}
+.lesson9-practice[data-practice="revise"] .practice-term .flow-char{color:#a42a24;background:#fff1ed;box-sizing:border-box;border:2px solid #bb3f34;border-radius:8px}
 .practice-zhuyin{position:absolute;inset:4px auto auto -25px;color:#005ead;font:24px/1.05 var(--font-kai);writing-mode:vertical-rl;text-orientation:upright}
 .practice-picture{position:absolute;left:0;margin:0;padding:12px;box-sizing:border-box;display:grid;place-items:center}
 .practice-picture.side{top:0;height:100%}
@@ -94,3 +94,6 @@
 .practice-picture img{width:100%;height:100%}
 .practice-picture img[src$="word-mascot.webp"]{width:min(100%,150px)}
 .practice-picture img[src$="dike.webp"],.practice-picture img[src$="nomination.webp"],.practice-picture img[src$="heading.webp"]{width:min(100%,230px)}
+
+.lesson9-practice[data-practice="revise"] .term-continues-from .flow-char{border-top-color:transparent;border-top-left-radius:0;border-top-right-radius:0}
+.lesson9-practice[data-practice="revise"] .term-continues-to .flow-char{border-bottom-color:transparent;border-bottom-left-radius:0;border-bottom-right-radius:0}
