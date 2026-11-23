@@ -68,12 +68,15 @@ assert.throws(()=>validate({...sample,surfaces:{'note:l9-word-unknown':[]}}));
 console.log('PASS: 14 word entries / 28 original examples, 14 picture introductions, 10 character groups; 38 popup note round-trips and cross-lesson rejection');
 const {readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,FONT}=require('./lesson9.js');
 assert.equal(FONT,85);
-assert.equal(readingLinks.length,7);
+assert.equal(readingLinks.length,12);
 assert.deepEqual(readingLinks.map(link=>readingLinkAnchor(link)),[
- 'p0-l1-c7','p0-l4-c3','p0-l3-c15','p0-l5-c0','p1-l1-c4','p1-l2-c11','p1-l5-c1'
-],'seven additions stay beside the requested textbook words / sentence punctuation');
+ 'p0-l1-c7','p0-l4-c3','p0-l3-c15','p0-l5-c0','p1-l1-c4','p1-l2-c11','p1-l5-c1',
+ 'p2-l3-c15','p2-l6-c1','p2-l7-c15','p3-l1-c8','p3-l5-c10'
+],'additions stay beside the requested textbook words / sentence punctuation');
 assert.deepEqual(readingLinks.filter(link=>link.kind==='video').map(link=>link.href),[
- 'https://youtu.be/I9kaasea5rA','https://youtu.be/4k_13OmWNSE','https://youtu.be/zaxh11eRXTE','https://youtu.be/qOlnIF6z2mA'
+ 'https://youtu.be/I9kaasea5rA','https://youtu.be/4k_13OmWNSE','https://youtu.be/zaxh11eRXTE','https://youtu.be/qOlnIF6z2mA',
+ 'https://youtu.be/yvqwVCr4hz4','https://youtu.be/zonXkZ6KAKU',
+ 'https://www.youtube.com/watch?v=Kl6jLVZVQx0','https://www.youtube.com/watch?v=Kl6jLVZVQx0'
 ]);
 for(const link of readingLinks){
  const token=tokens.find(t=>t.id===readingLinkAnchor(link));assert(token,'every addition has an existing text anchor');
@@ -92,17 +95,22 @@ for(const link of readingLinks){
 }
 assert.equal(noteContent('knowledge-unknown'),null);
 assert(noteContent('knowledge-monkhood').html.includes('並不是每一位泰國男性都一定會出家'));
-assert.equal(Object.keys(knowledgeNotes).length,3);
+assert.equal(Object.keys(knowledgeNotes).length,4);
+const festival=knowledgeNotes['music-festival'];
+const festivalLength=(festival.summary+festival.parts.map(([,text])=>text).join('')).replace(/[，。！？、：「」\s]/g,'').length;
+assert(festivalLength>=150&&festivalLength<=200,'music festival introduction is 150–200 characters');
+assert(readingLinkMarkup('p2-l3-c15').includes('on-right'),'windmill video is on the right of 水');
 for(const [w,h] of [[1363,938],[1660,930],[1200,740],[980,620],[600,500],[240,540],[3490,1950]]){
  const pages=paginate(w,h);
  const anchors=pages.flatMap(p=>p.cells.flatMap(t=>readingLinks.filter(link=>readingLinkAnchor(link)===t.id).map(link=>link.id)));
- assert.deepEqual([...anchors].sort(),readingLinks.map(link=>link.id).sort(),'all seven additions remain reachable across pagination');
+ assert.deepEqual([...anchors].sort(),readingLinks.map(link=>link.id).sort(),'all additions remain reachable across pagination');
  for(const page of pages)for(const t of page.cells.filter(t=>readingLinkMarkup(t.id))){
-  const left=w-(24+t.col*page.pitch)-FONT*1.12-28,top=10+t.row*page.rowHeight+4;
-  assert(left>=0&&top+64<=h,'badges stay inside the reading board');
+  const onRight=readingLinks.some(link=>readingLinkAnchor(link)===t.id&&link.side==='right');
+  const left=onRight?w-(24+t.col*page.pitch)+24-29:w-(24+t.col*page.pitch)-FONT*1.12-28,top=10+t.row*page.rowHeight+4;
+  assert(left>=0&&left+29<=w&&top+64<=h,'badges stay inside the reading board');
  }
 }
-console.log('PASS: 4 exact new-tab video links, 3 sourced knowledge dialogs, stable text anchors, popup note round-trips and badge bounds');
+console.log('PASS: 8 exact new-tab video links, 4 sourced knowledge dialogs, stable text anchors, popup note round-trips and badge bounds');
 
 const lesson9 = require('./lesson9.js');
 const { practice, practicePages, practiceReader } = lesson9;

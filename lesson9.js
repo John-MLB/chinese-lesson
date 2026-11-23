@@ -178,7 +178,12 @@ const readingLinks=[
  {id:'knowledge-market',kind:'knowledge',p:0,l:5,phrase:'場。',offset:0,title:'水上市場怎麼做生意？'},
  {id:'video-egypt',kind:'video',p:1,l:1,phrase:'埃及',offset:1,title:'認識埃及',href:'https://youtu.be/4k_13OmWNSE'},
  {id:'video-nile',kind:'video',p:1,l:2,phrase:'尼羅河',offset:1,title:'認識尼羅河',href:'https://youtu.be/zaxh11eRXTE'},
- {id:'video-pyramids',kind:'video',p:1,l:5,phrase:'金字塔',offset:1,title:'認識金字塔',href:'https://youtu.be/qOlnIF6z2mA'}
+ {id:'video-pyramids',kind:'video',p:1,l:5,phrase:'金字塔',offset:1,title:'認識金字塔',href:'https://youtu.be/qOlnIF6z2mA'},
+ {id:'video-windmill-drainage',kind:'video',p:2,l:3,phrase:'排水',offset:1,side:'right',title:'風車排水',href:'https://youtu.be/yvqwVCr4hz4'},
+ {id:'video-wooden-shoes',kind:'video',p:2,l:6,phrase:'鞋子',offset:1,title:'荷蘭木鞋',href:'https://youtu.be/zonXkZ6KAKU'},
+ {id:'video-flowers',kind:'video',p:2,l:7,phrase:'鬱金香和水',offset:4,title:'鬱金香和水仙旁的補充影片',href:'https://www.youtube.com/watch?v=Kl6jLVZVQx0'},
+ {id:'video-austria',kind:'video',p:3,l:1,phrase:'奧地利，',offset:3,title:'奧地利旁的補充影片',href:'https://www.youtube.com/watch?v=Kl6jLVZVQx0'},
+ {id:'knowledge-music-festival',kind:'knowledge',p:3,l:5,phrase:'音樂節',offset:2,title:'奧地利的音樂節'}
 ];
 function readingLinkAnchor(link){
  const line=countries[link.p]?.lines[link.l]?.replace(/[【】]/g,'')||'',start=line.indexOf(link.phrase);
@@ -202,7 +207,11 @@ const knowledgeNotes={
   ['賣東西的人怎麼賣？','有些攤販把水果、蔬菜和食物放在小船上，把船當成攤位；有些甚至在船上煮食物。水邊也有店家和攤位，所以水上市場不只有船。'],
   ['買東西的人怎麼買？','顧客可以在岸邊逛，也可以搭船靠近攤販。看好東西、問清楚價錢後，再付款、拿商品。例如，船靠近賣水果的攤販，就可以買一袋水果。'],
   ['有什麼特色？','船隻來來往往，船上有各種食物，岸邊有店家，買東西也像在認識水邊的生活。現在，有些水上市場也吸引許多旅客。各市場的時間不同，有的清早熱鬧，有的傍晚才熱鬧；不是全部都在清晨五點開市。']
- ],sources:[['泰國觀光局：丹嫩莎朵水上市場的由來','https://www.tourismthailand.org/Attraction/damnoen-saduak-floating-market'],['泰國觀光局：早市與晚市的不同風貌','https://www.tourismthailand.org/Articles/floating-market-en'],['泰國觀光目錄：搭船逛水上市場','https://www.thailandtourismdirectory.go.th/en/attraction/1358']]}
+ ],sources:[['泰國觀光局：丹嫩莎朵水上市場的由來','https://www.tourismthailand.org/Attraction/damnoen-saduak-floating-market'],['泰國觀光局：早市與晚市的不同風貌','https://www.tourismthailand.org/Articles/floating-market-en'],['泰國觀光目錄：搭船逛水上市場','https://www.thailandtourismdirectory.go.th/en/attraction/1358']]},
+ 'music-festival':{title:'奧地利的音樂節',summary:'音樂節就像一場音樂盛會，在一段時間內安排許多表演，讓大家一起欣賞。',parts:[
+  ['有哪些精彩表演？','奧地利有許多音樂節，其中薩爾茲堡音樂節每年夏天舉行，已有一百多年的歷史。來自世界各地的音樂家齊聚一堂，帶來音樂會、歌劇，也有戲劇演出。歌劇是把故事用歌聲、音樂和表演呈現出來。'],
+  ['為什麼吸引旅客？','人們能欣賞莫札特等作曲家的作品，感受現場演奏的魅力。許多外國旅客特地前來，一邊聽音樂，一邊欣賞當地風景，讓旅行充滿藝術的樂趣。']
+ ],sources:[['薩爾茲堡音樂節官方介紹','https://www.salzburgerfestspiele.at/en/about-us'],['薩爾茲堡官方旅遊網站：音樂節','https://www.salzburg.info/en/salzburg/salzburg-festival/salzburg-festival']]}
 };
 // Fixed textbook annotations, separate from the teacher's editable ink.
 const studyKinds={rhetoric:{label:'修辭　類疊'},cause:{label:'句型　因果'}};
@@ -303,7 +312,7 @@ function sourceMarkup(sources,caption='資料來源（介紹已改寫）'){
 function readingLinkMarkup(tokenId){
  return readingLinks.filter(link=>readingLinkAnchor(link)===tokenId).map(link=>{
   const label=link.kind==='video'?'影片':'知識',description=`${label}：${link.title}${link.kind==='video'?'（另開新分頁）':''}`;
-  const common=`class="lesson9-reading-link ${link.kind}" data-reading-link="${link.id}" aria-label="${escapeHTML(description)}" title="${escapeHTML(description)}"`;
+  const common=`class="lesson9-reading-link ${link.kind}${link.side==='right'?' on-right':''}" data-reading-link="${link.id}" aria-label="${escapeHTML(description)}" title="${escapeHTML(description)}"`;
   return link.kind==='video'?`<a ${common} href="${escapeHTML(link.href)}" target="_blank" rel="noopener noreferrer">${label}</a>`:`<button type="button" ${common} data-lesson9-note="${link.id}" aria-haspopup="dialog">${label}</button>`;
  }).join('');
 }
