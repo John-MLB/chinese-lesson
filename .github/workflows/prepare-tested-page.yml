@@ -1,46 +1,64 @@
-name: Prepare verified teaching document
+name: Verify published lesson boards
 on:
   push:
     branches: [layout-publish-20261124-header]
 permissions:
-  contents: write
+  contents: read
 jobs:
-  prepare:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 1ec60b15d2d674ec9e05ac2901f51fb3e2c7c415
+          ref: 0b2b08dbad9b2c387e73769b6c96a7e1cfffcad9
           persist-credentials: false
-      - name: Reproduce the browser-tested page
-        env:
-          GH_TOKEN: ${{ github.token }}
+      - name: Compare the live teaching files with the tested release
         shell: python
         run: |
-          import base64, json, os, subprocess, urllib.request
           from pathlib import Path
-          p = Path("classroom.html")
-          s = p.read_text()
-          marker = '<div class="annotation-key" aria-label'
-          a = s.index(marker)
-          legend = s[a:s.index('</div>', a) + 6]
-          changes = [
-              ('lesson9.js?v=5', 'lesson9.js?v=6'),
-              ('lesson9.css?v=6', 'lesson9.css?v=7'),
-              ("document.body.classList.toggle('reading-mode',reading);", "document.body.classList.toggle('reading-mode',reading);\n  document.body.classList.toggle('teaching-page',reading || route==='lesson9-write' || route==='lesson7-overview');"),
-              ('<p class="kicker">第${n}課</p><h1>${titles[n]}</h1><div class="empty">', '<div class="empty" aria-label="${titles[n]}">'),
-              ('<div class="reading-toolbar"><h1>建築界的長頸鹿</h1>' + legend + '</div>', ''),
-              ('aria-label="課文翻頁"><span id="reading-count"', 'aria-label="課文翻頁">' + legend + '<span id="reading-count"')
-          ]
-          for old, new in changes:
-              assert old in s
-              s = s.replace(old, new)
-          p.write_text(s)
-          expected = "1b5befdea4a390d1ba4046189956b563523434a8"
-          assert subprocess.check_output(["git", "hash-object", str(p)], text=True).strip() == expected
-          payload = json.dumps({"encoding": "base64", "content": base64.b64encode(p.read_bytes()).decode("ascii")}).encode()
-          url = "https://api.github.com/repos/John-MLB/chinese-lesson/git/blobs"
-          request = urllib.request.Request(url, data=payload, headers={"Authorization": "Bearer " + os.environ["GH_TOKEN"], "Content-Type": "application/json"})
-          with urllib.request.urlopen(request) as response:
-              assert json.load(response)["sha"] == expected
-          print("Verified teaching document uploaded")
+          from time import sleep, time_ns
+          from urllib.request import urlopen
+          for name in ('index.html','classroom-shell.js','classroom.html','lesson9.css','lesson9.js'):
+              expected = Path(name).read_bytes()
+              for attempt in range(12):
+                  with urlopen('https://john-mlb.github.io/chinese-lesson/' + name + '?verify=' + str(time_ns()), timeout=25) as response:
+                      if response.read() == expected:
+                          break
+                  sleep(5)
+              else:
+                  raise RuntimeError(name)
+              print(name, 'verified')
+      - name: Open the classroom pages in Chrome
+        run: |
+          npm install --prefix "$RUNNER_TEMP/classroom-check" --no-audit --no-fund playwright-core@1.56.1
+          cd "$RUNNER_TEMP/classroom-check"
+          node <<'JS'
+          const {chromium}=require('playwright-core');
+          const assert=require('node:assert/strict');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',args:['--no-sandbox']});
+            try {
+              const page=await browser.newPage({viewport:{width:1920,height:900}});
+              const errors=[];
+              page.on('pageerror',e=>errors.push(e.message));
+              for(const [route,selector] of [['lesson9-text-8','.continuous-board'],['lesson9-write','.empty'],['lesson9-recognize-1','.practice-intro'],['lesson9-words-1','.practice-intro'],['lesson9-revise-1','.practice-intro'],['lesson8-overview-1','.flow-column'],['home','.cards']]){
+                await page.goto('https://john-mlb.github.io/chinese-lesson/?release=0b2b08d#'+route);
+                const f=page.frameLocator('#classroom');
+                await f.locator(selector).first().waitFor();
+                if(route!=='home')assert(!(await f.locator('body > header').isVisible()));
+                if(route==='lesson9-text-8'){
+                  assert.equal((await f.locator('#reading-count').innerText()).trim(),'6 / 6');
+                  assert((await f.locator('.continuous-board').boundingBox()).y<9);
+                }
+                if(selector==='.practice-intro'){
+                  await f.locator('.practice-note-link:visible').first().click();
+                  await f.locator('dialog[open]').waitFor();
+                  await f.locator('[data-lesson9-close]:visible').first().click();
+                  await f.locator('dialog[open]').waitFor({state:'hidden'});
+                }
+                console.log(route,'passed');
+              }
+              assert.deepEqual(errors,[]);
+            } finally {await browser.close()}
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
