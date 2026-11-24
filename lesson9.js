@@ -371,10 +371,10 @@ if(typeof document!=='undefined'){
  dialog?.addEventListener('close',()=>{if(!dialog.open){dialog.classList.remove('lesson9-note');delete dialog.dataset.lesson9Note;noteOpener=null}});
 }
 function catalogue(){return `<section class="lesson9-catalogue"><p class="kicker">第三單元・第九課</p><h1>請到我的家鄉來</h1><div class="lesson9-menu">${sections.map((s,i)=>`<a class="card ${s.ready?'current':''}" href="#lesson9-${s.id}${s.ready?'-1':''}"><span class="lesson9-card-icon" aria-hidden="true">${s.icon}</span><span class="number">0${i+1}</span><h2>${s.title}</h2><p>${s.description}${s.ready?' →':''}</p></a>`).join('')}</div></section>`}
-function placeholder(id){const s=sections.find(s=>s.id===id);return s?`<p class="kicker">第九課・請到我的家鄉來</p><h1>${s.title}</h1><div class="empty"><p>這個部分準備中。</p></div><a class="button" href="#lesson9">回第九課目錄</a>`:catalogue()}
+function placeholder(id){const s=sections.find(s=>s.id===id);return s?`<div class="empty"><p>${s.title}的內容準備中。</p></div><a class="button" href="#lesson9">回第九課目錄</a>`:catalogue()}
 function practiceReader(id){
  const section=sections.find(section=>section.id===id);
- return `<div class="reading-toolbar lesson9-practice-toolbar"><h1>${section.title}${id==='revise'?'<span class="practice-item-label"></span>':''}</h1><button type="button" class="practice-note-link" data-lesson9-note aria-haspopup="dialog"></button></div><div class="continuous-board lesson9-board lesson9-practice" data-practice="${id}" aria-label="${section.title}，從右到左直排"><p class="practice-intro">${practice[id].prompt}</p></div><nav class="reading-pager" aria-label="練習翻頁"><span id="reading-count" class="small" aria-live="polite"></span></nav>`;
+ return `<div class="continuous-board lesson9-board lesson9-practice" data-practice="${id}" aria-label="${section.title}，從右到左直排"><p class="practice-intro">${practice[id].prompt}</p></div><nav class="reading-pager" aria-label="練習翻頁">${id==='revise'?'<span class="practice-item-label"></span>':''}<button type="button" class="practice-note-link" data-lesson9-note aria-haspopup="dialog" hidden></button><span id="reading-count" class="small" aria-live="polite"></span></nav>`;
 }
 function practicePages(id,width,height){
  const pages=[];
@@ -438,8 +438,8 @@ function layoutPractice(anchor){
  const index=grouped?0:anchored>=0?anchored:Math.max(0,Math.min(requested,pages.length-1));
  lessonInk.beforeChange();
  board.replaceChildren(intro);
- const toolbarLink=document.querySelector('.practice-note-link');
- toolbarLink.hidden=grouped;
+ const pagerLink=document.querySelector('.reading-pager .practice-note-link');
+ pagerLink.hidden=grouped;
  const label=document.querySelector('.practice-item-label');
  if(label)label.textContent=grouped?'':pages[index].item.label;
  for(const [group,page] of (grouped?pages:[pages[index]]).entries()){
@@ -466,7 +466,7 @@ function layoutPractice(anchor){
   if(grouped)figure.firstElementChild.style.cssText='height:100%;max-height:116px;width:54%';
   board.append(figure);
  }
- const link=grouped?toolbarLink.cloneNode(false):toolbarLink;
+ const link=grouped?pagerLink.cloneNode(false):pagerLink;
  if(grouped){
   link.hidden=false;
   link.style.cssText=`position:absolute;right:${offset+12}px;bottom:12px;z-index:6`;
@@ -491,7 +491,7 @@ function setLesson9Pager(section,index,total){
   next.onclick=()=>location.hash=`lesson9-${section}-${index+2}`;
  }
 }
-function reader(){return `<div class="reading-toolbar"><h1>請到我的家鄉來</h1><span class="lesson9-source">課本第94～97頁</span></div><div class="continuous-board lesson9-board" data-lesson="lesson9" aria-label="第九課課文，由右至左直排，藍色為本課語詞"></div><nav class="reading-pager" aria-label="課文翻頁"><span id="reading-count" class="small" aria-live="polite"></span></nav>`}
+function reader(){return `<div class="continuous-board lesson9-board" data-lesson="lesson9" aria-label="第九課課文，由右至左直排，藍色為本課語詞"></div><nav class="reading-pager" aria-label="課文翻頁"><span id="reading-count" class="small" aria-live="polite"></span></nav>`}
 function layout(anchor){
  const board=document.querySelector('.lesson9-board');if(!board)return;
  lessonInk.beforeChange();board.style.fontSize=FONT+'px';

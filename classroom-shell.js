@@ -27,5 +27,5 @@
  new ResizeObserver(fit).observe(document.documentElement);
  fit();
  // Same-origin storage and the existing fragment URLs are preserved.
- frame.src='classroom.html?v=20261124-5'+(location.hash||'#home');
+ frame.src='classroom.html?v=20261124-6'+(location.hash||'#home');
 })();

@@ -103,3 +103,11 @@
 .lesson9-practice .practice-intro{position:absolute;z-index:1;inset:0 0 auto;margin:0;padding:8px 12px;box-sizing:border-box;background:#edf6ef;color:#174e40;font:700 clamp(25px,calc(var(--sheet-vw) * 2.6),48px)/1.24 var(--font-kai);text-align:center}
 .lesson9-practice .practice-intro.vertical{inset:0 0 0 auto;writing-mode:vertical-rl;text-orientation:mixed;padding:14px 9px;text-align:start;border-left:1px solid #c7d9ca}
 .lesson9-practice[data-practice] .practice-heading .flow-char{background:linear-gradient(90deg,transparent 5%,#ffed66 5% 95%,transparent 95%);border-radius:0}
+
+/* Give the reclaimed header space to the board before the reader paginates it. */
+body.teaching-page > header{display:none}
+.teaching-page > main{padding-top:4px}
+.teaching-page.reading-mode > main{height:100dvh}
+.teaching-page .continuous-board{border-top:0}
+.teaching-page > main > .empty:first-child{margin-top:0}
+.practice-item-label:empty{display:none}
