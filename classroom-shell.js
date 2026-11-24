@@ -1,4 +1,4 @@
-/* One teaching canvas: viewport changes scale the complete page, never its layout. */
+/* Scale the teaching type and expose the full viewport width for content reflow. */
 (() => {
  'use strict';
  const WIDTH=1536,HEIGHT=864,frame=document.getElementById('classroom');
@@ -6,7 +6,7 @@
   const width=document.documentElement.clientWidth,height=document.documentElement.clientHeight;
   if (!width || !height) return;
   const scale=Math.min(width/WIDTH,height/HEIGHT);
-  // Rails use the frame edges. The centered teaching sheet keeps its own width.
+  // The inner document lays out text, images and controls across this width.
   frame.style.width=(width/scale)+'px';
   frame.style.transform=`translate(0px,${(height-HEIGHT*scale)/2}px) scale(${scale})`;
  }
@@ -27,5 +27,5 @@
  new ResizeObserver(fit).observe(document.documentElement);
  fit();
  // Same-origin storage and the existing fragment URLs are preserved.
- frame.src='classroom.html?v=20261124-4'+(location.hash||'#home');
+ frame.src='classroom.html?v=20261124-5'+(location.hash||'#home');
 })();

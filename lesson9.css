@@ -1,5 +1,5 @@
 /* Lesson 9 shares the classroom typeface, rails and 85px text of Lesson 8. */
-.lesson9-catalogue{max-width:2000px;margin:auto;padding-top:1vh}
+.lesson9-catalogue{margin:0;padding-top:1vh}
 .lesson9-catalogue>h1{font-size:clamp(38px,calc(var(--sheet-vw) * 4.2),90px)}
 .lesson9-menu{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px;margin:28px 0}
 .lesson9-menu .card{position:relative;min-height:205px;padding:24px 28px}

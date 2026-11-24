@@ -11,7 +11,7 @@ vm.runInNewContext(fs.readFileSync('classroom-shell.js','utf8'),{
  ResizeObserver:class{constructor(fn){this.fn=fn}observe(){}},location,
  history:{state:null,replaceState:(...args)=>routes.push(args)}
 });
-assert.equal(frame.src,'classroom.html?v=20261124-4#lesson9-text-3');
+assert.equal(frame.src,'classroom.html?v=20261124-5#lesson9-text-3');
 for(const [w,h] of [[1920,1080],[1920,940],[1280,720],[768,1024],[1366,768]]){
  Object.assign(viewport,{clientWidth:w,clientHeight:h});callbacks.resize();
  const [x,y,s]=frame.style.transform.match(/-?\d+(?:\.\d+)?(?:e[+-]?\d+)?/g).map(Number);
@@ -21,7 +21,7 @@ for(const [w,h] of [[1920,1080],[1920,940],[1280,720],[768,1024],[1366,768]]){
  const text={x:800,y:450},ink={x:870,y:460};
  assert(Math.abs(((x+ink.x*s)-(x+text.x*s))/s-70)<1e-8);
  assert(Math.abs(((y+ink.y*s)-(y+text.y*s))/s-10)<1e-8);
- assert.equal(frame.src,'classroom.html?v=20261124-4#lesson9-text-3');
+ assert.equal(frame.src,'classroom.html?v=20261124-5#lesson9-text-3');
 }
 callbacks.message({source:{},origin:location.origin,data:{type:'classroom-route',hash:'#home'}});
 callbacks.message({source:frame.contentWindow,origin:'https://untrusted.test',data:{type:'classroom-route',hash:'#home'}});
@@ -46,3 +46,8 @@ const pages = paginate(1352, 719);
 assert.equal(pages.length, 8);
 assert.equal(pages[2].cells.slice(0, 6).map(cell => cell.char).join(''), '我的家鄉來！');
 assert.equal(pages[2].picture, 1);
+
+const widePages = paginate(1659, 719);
+assert(widePages[0].cols > pages[0].cols);
+const ids = pages => pages.flatMap(page => page.cells.map(cell => cell.id));
+assert.deepEqual(ids(widePages), ids(pages), 'reflow keeps every token in textbook order');

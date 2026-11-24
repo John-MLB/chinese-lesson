@@ -478,7 +478,7 @@ function layoutPractice(anchor){
  link.onclick=()=>openLessonNote(link.dataset.lesson9Note,link);
  }
  setLesson9Pager(id,index,grouped?1:pages.length);
- if(anchor||(grouped&&requested>0))history.replaceState(history.state,'',`#lesson9-${id}-${index+1}`);
+ if(anchor || requested!==index)history.replaceState(history.state,'',`#lesson9-${id}-${index+1}`);
  lessonInk.refresh();
  return index+1;
 }
@@ -516,7 +516,7 @@ function layout(anchor){
  }
  board.onclick=event=>{const button=event.target.closest('[data-lesson9-note]');if(button)openLessonNote(button.dataset.lesson9Note,button)};
  setLesson9Pager('text',index,pages.length);
- if(anchor)history.replaceState(history.state,'','#lesson9-text-'+(index+1));
+ if(anchor || requested!==index)history.replaceState(history.state,'','#lesson9-text-'+(index+1));
  lessonInk.refresh();return index+1;
 }
 const api={practice,practicePages,practiceReader,layoutPractice,sections,countries,words,glyphs,pictureNotes,readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
