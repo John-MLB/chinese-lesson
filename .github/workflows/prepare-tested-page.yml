@@ -1,0 +1,46 @@
+name: Prepare verified teaching document
+on:
+  push:
+    branches: [layout-publish-20261124-header]
+permissions:
+  contents: write
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: 1ec60b15d2d674ec9e05ac2901f51fb3e2c7c415
+          persist-credentials: false
+      - name: Reproduce the browser-tested page
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: python
+        run: |
+          import base64, json, os, subprocess, urllib.request
+          from pathlib import Path
+          p = Path("classroom.html")
+          s = p.read_text()
+          marker = '<div class="annotation-key" aria-label'
+          a = s.index(marker)
+          legend = s[a:s.index('</div>', a) + 6]
+          changes = [
+              ('lesson9.js?v=5', 'lesson9.js?v=6'),
+              ('lesson9.css?v=6', 'lesson9.css?v=7'),
+              ("document.body.classList.toggle('reading-mode',reading);", "document.body.classList.toggle('reading-mode',reading);\n  document.body.classList.toggle('teaching-page',reading || route==='lesson9-write' || route==='lesson7-overview');"),
+              ('<p class="kicker">第${n}課</p><h1>${titles[n]}</h1><div class="empty">', '<div class="empty" aria-label="${titles[n]}">'),
+              ('<div class="reading-toolbar"><h1>建築界的長頸鹿</h1>' + legend + '</div>', ''),
+              ('aria-label="課文翻頁"><span id="reading-count"', 'aria-label="課文翻頁">' + legend + '<span id="reading-count"')
+          ]
+          for old, new in changes:
+              assert old in s
+              s = s.replace(old, new)
+          p.write_text(s)
+          expected = "1b5befdea4a390d1ba4046189956b563523434a8"
+          assert subprocess.check_output(["git", "hash-object", str(p)], text=True).strip() == expected
+          payload = json.dumps({"encoding": "base64", "content": base64.b64encode(p.read_bytes()).decode("ascii")}).encode()
+          url = "https://api.github.com/repos/John-MLB/chinese-lesson/git/blobs"
+          request = urllib.request.Request(url, data=payload, headers={"Authorization": "Bearer " + os.environ["GH_TOKEN"], "Content-Type": "application/json"})
+          with urllib.request.urlopen(request) as response:
+              assert json.load(response)["sha"] == expected
+          print("Verified teaching document uploaded")
