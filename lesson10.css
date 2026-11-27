@@ -64,7 +64,22 @@
   gap: max(2px, .85cqw);
   font-size: var(--verse-font);
 }
-.verse-line { flex:none; display: flex; flex-direction: column; align-items: center; }
+.verse-line { position:relative; flex:none; display: flex; flex-direction: column; align-items: center; }
+.lesson10-music-link {
+  position: absolute;
+  right: calc(100% + 2 * var(--verse-font));
+  top: calc(.42 * var(--verse-font));
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  padding: 9px 7px;
+  border: 2px solid #44685b;
+  border-radius: 8px;
+  background: #fff5d0;
+  color: #204b3e;
+  font: 400 30px/1.15 var(--font-kai);
+  text-decoration: none;
+}
+.lesson10-music-link:hover, .lesson10-music-link:focus-visible { background: #ffe48a; }
 .verse-line small { font: 600 .29em/1.45 system-ui, sans-serif; color: #4d655c; }
 .verse-text, .story-copy p, .lesson10-verse h2, .story-copy h2 { writing-mode: vertical-rl; margin: 0; }
 .verse-text { line-height: 1.02; letter-spacing: 0; }
