@@ -96,10 +96,25 @@ function practice(id) {
  return `<section class="lesson10-practice"><h1>${title}</h1>${bodies[id]()}</section>`;
 }
 
+const vocabularySupplements={
+ 旋律:{image:'lesson10-vocab-melody.webp',alt:'孩子敲木琴，音符從琴上跳出來',caption:'把不同的音連成一段曲調',
+  fact:'敲響木琴時，琴片會振動。振動越快，聽到的音通常越高。',source:['耶魯教師研究所','https://teachersinstitute.yale.edu/curriculum/units/2000/5/00.05.05/3']},
+ 一瞬間:{image:'lesson10-vocab-instant.webp',alt:'一顆泡泡在眼前突然破掉',caption:'泡泡一下子就破了',
+  fact:'眨一次眼，眼淚就會在眼球表面鋪成薄薄一層，讓眼睛保持溼潤。',source:['美國國家眼科研究所','https://www.nei.nih.gov/eye-health-information/healthy-vision/how-eyes-work/how-tears-work']},
+ 牙:{image:'lesson10-vocab-teeth.webp',alt:'牙齒插圖，旁邊畫出不同形狀的牙',caption:'牙齒形狀不同，工作也不同',
+  fact:'門牙像小刀，能切斷食物。犬齒尖尖的，能撕開食物。後面的臼齒比較寬，能把食物磨碎。',source:['美國牙醫學會','https://www.ada.org/-/media/project/ada-organization/ada/mouthhealthy/files/smile-smarts/ada_watchyourmouth_presentation.pdf']},
+ 芝麻:{image:'lesson10-vocab-sesame.webp',alt:'芝麻植株、裂開的果實，以及黑芝麻和白芝麻',caption:'芝麻長在細長的果實裡',
+  fact:'芝麻籽藏在細長的果實裡。有些芝麻的果實成熟變乾後會裂開，讓芝麻籽掉出來。',source:['芝麻果實研究','https://pmc.ncbi.nlm.nih.gov/articles/PMC5056167/']},
+ 大盜:{image:'lesson10-vocab-bandit.webp',alt:'故事裡戴眼罩、提布袋的大盜',caption:'故事裡的大盜',
+  fact:'指尖有細細的紋路。摸過光滑表面，有時會留下指紋，成為調查線索。',source:['美國司法研究所','https://www.ojp.gov/library/publications/fingerprint-sourcebook-chapter-2-anatomy-and-physiology-adult-friction-ridge']},
+ 臉龐:{image:'lesson10-vocab-face.webp',alt:'孩子正面微笑，可以看見臉頰和臉的輪廓',caption:'微笑的臉龐',
+  fact:'微笑時，臉部的肌肉會把嘴角往上拉。同一張臉能做出許多不同的表情。',source:['克里夫蘭診所','https://my.clevelandclinic.org/health/body/21672-facial-muscles']},
+ 榮華富貴:{image:'lesson10-cave.webp',alt:'課本故事插圖，山洞裡堆著金銀財寶',caption:'故事中的金銀財寶',
+  fact:'故事常用黃金代表財富。純金比較軟，可以敲打成很薄的金箔。',source:['美國地質調查局','https://pubs.usgs.gov/gip/prospect1/goldgip.html']},
+ 搓:{fact:'兩手來回搓時，摩擦會把一部分動作的能量變成熱，所以手掌會暖起來。',source:['美國物理學會','https://www.aps.org/learning-resources/students/friction-fun']}
+};
 function vocabulary(term) {
- const [sound,meaning,example] = words[term];
- return {category:'認識詞語',title:term,html:
- `<p class="lesson9-pronunciation">${sound}</p><h3>課文中的意思</h3><p class="takeaway">${meaning}</p><h3>一起讀例句</h3><p class="lesson9-example">${example}</p><details class="lesson9-note-sources"><summary>字義查考：萌典；例句為自編</summary><ul><li><a href="https://www.moedict.tw/${encodeURIComponent(term)}" target="_blank" rel="noopener noreferrer">萌典：${term}</a></li></ul></details>`};
+ return classroomVocabulary.note(term,...words[term],vocabularySupplements[term]);
 }
 
 const app=document.querySelector('#app');
