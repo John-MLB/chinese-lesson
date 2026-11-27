@@ -12,6 +12,7 @@ const NOTE9_IDS=[
  ...['monkhood','monarchy','market','music-festival'].map(id=>'l9-knowledge-'+id),
  ...['dike','nomination','heading','appearance','atmosphere','cause','purpose'].map(id=>'l9-practice-'+id)
 ];
+const lessonNumbers={lesson8:'八',lesson9:'九',lesson10:'十'};
 const MAX_POINTS=150000, MAX_BYTES=12*1024*1024;
 const clone=value=>JSON.parse(JSON.stringify(value));
 const emptyBook=lesson=>({format:'chinese-lesson-notes',version:1,lesson,surfaces:{}});
@@ -21,17 +22,17 @@ const lessonSessions=new Map();
 let past=[],future=[],mode='view',color=COLORS[0],width=3,surface=null,panel=null,gesture=null,saveTimer,toastTimer;
 let localProblem=false;
 function validate(raw){
- if(!raw||raw.format!=='chinese-lesson-notes'||raw.version!==1||!['lesson8','lesson9'].includes(raw.lesson)||!raw.surfaces||typeof raw.surfaces!=='object'||Array.isArray(raw.surfaces))throw Error('這不是本站的課堂筆記檔。');
+ if(!raw||raw.format!=='chinese-lesson-notes'||raw.version!==1||!Object.hasOwn(lessonNumbers,raw.lesson)||!raw.surfaces||typeof raw.surfaces!=='object'||Array.isArray(raw.surfaces))throw Error('這不是本站的課堂筆記檔。');
  const clean={format:raw.format,version:1,lesson:raw.lesson,surfaces:{}};let count=0,total=0;
  for(const [key,strokes] of Object.entries(raw.surfaces)){
-  if(key!==raw.lesson&&!(raw.lesson==='lesson8'?NOTE_IDS:NOTE9_IDS).includes(key.replace(/^note:/,'')))throw Error('筆記頁面名稱不正確。');
+  if(key!==raw.lesson&&!(raw.lesson==='lesson10'?/^note:l10-word-[\p{Script=Han}]{1,4}$/u.test(key):(raw.lesson==='lesson8'?NOTE_IDS:NOTE9_IDS).includes(key.replace(/^note:/,''))))throw Error('筆記頁面名稱不正確。');
   if(key!==raw.lesson&&!key.startsWith('note:'))throw Error('筆記頁面名稱不正確。');
   if(!Array.isArray(strokes)||(total+=strokes.length)>5000)throw Error('筆記筆數太多。');
   clean.surfaces[key]=strokes.map(s=>{
    if(!s||!(s.tool==='highlight'?HIGHLIGHT_COLORS:COLORS).includes(s.color)||![3,6,10].includes(s.width)||!['pen','line','highlight'].includes(s.tool)||!Array.isArray(s.points)||s.points.length<1||s.points.length>12000)throw Error('筆跡資料不完整。');
    count+=s.points.length;if(count>MAX_POINTS)throw Error('筆記太大，請分成不同檔案保存。');
    const points=s.points.map(p=>{
-    const pattern=key==='lesson8'?/^p[0-4]-l\d{1,2}-c\d{1,3}$/:key==='lesson9'?/^(?:p[0-3]-(?:l\d{1,2}-(?:c\d{1,3}|indent|number)|image[0-3])|s[2-4]-i[0-2]-l[01]-c\d{1,3})$/:/^b\d{1,3}$/;
+    const pattern=key==='lesson8'?/^p[0-4]-l\d{1,2}-c\d{1,3}$/:key==='lesson9'?/^(?:p[0-3]-(?:l\d{1,2}-(?:c\d{1,3}|indent|number)|image[0-3])|s[2-4]-i[0-2]-l[01]-c\d{1,3})$/:key==='lesson10'?/^(?:story-c\d{1,3}|l[1-5]-r[0-8]-c\d{1,2})$/:/^b\d{1,3}$/;
     if(!p||typeof p.a!=='string'||!pattern.test(p.a)||![p.x,p.y].every(v=>Number.isFinite(v)&&Math.abs(v)<=30))throw Error('筆跡座標不正確。');
     return {a:p.a,x:p.x,y:p.y};
    });
@@ -136,12 +137,12 @@ function updatePanel(){document.querySelectorAll('[data-history]').forEach(b=>b.
 function undoRedo(redo){finishGesture();const from=redo?future:past,to=redo?past:future;if(!from.length)return;to.push(clone(book));book=from.pop();saveLocal();redraw();updatePanel()}
 function stamp(){return new Date().toISOString().slice(0,19).replace(/[:T]/g,'-')}
 function serialized(){return JSON.stringify({...book,savedAt:new Date().toISOString()},null,2)}
-function download(){finishGesture();saveLocal();const url=URL.createObjectURL(new Blob([serialized()],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='國語第'+(book.lesson==='lesson9'?'九':'八')+'課筆記-'+stamp()+'.json';host().append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('已送出筆記檔下載，請在瀏覽器下載項目中確認。')}
+function download(){finishGesture();saveLocal();const url=URL.createObjectURL(new Blob([serialized()],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='國語第'+lessonNumbers[book.lesson]+'課筆記-'+stamp()+'.json';host().append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),2000);toast('已送出筆記檔下載，請在瀏覽器下載項目中確認。')}
 async function saveFolder(){
  finishGesture();saveLocal();
  if(!window.showSaveFilePicker){toast('此瀏覽器不支援選資料夾存檔。請下載筆記檔，再放入電腦的同步資料夾。');return}
  try{
-  const handle=await window.showSaveFilePicker({id:'chinese-lesson-notes',suggestedName:'國語第'+(book.lesson==='lesson9'?'九':'八')+'課筆記-'+stamp()+'.json',types:[{description:'可繼續編輯的課堂筆記',accept:{'application/json':['.json']}}]});
+  const handle=await window.showSaveFilePicker({id:'chinese-lesson-notes',suggestedName:'國語第'+lessonNumbers[book.lesson]+'課筆記-'+stamp()+'.json',types:[{description:'可繼續編輯的課堂筆記',accept:{'application/json':['.json']}}]});
   const writable=await handle.createWritable();try{await writable.write(serialized());await writable.close()}catch(err){try{await writable.abort()}catch{}throw err}
   toast('筆記已存入所選資料夾。若為同步資料夾，請由同步程式確認雲端上傳。');
  }catch(err){if(err.name!=='AbortError'){console.warn('Note file save:',err.name,err.message);toast('這次無法直接寫入資料夾，請改用「下載筆記到本機」，再移入同步資料夾。')}}
@@ -150,7 +151,7 @@ function importFile(){
  const input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.hidden=true;host().append(input);
  input.oncancel=()=>input.remove();input.onchange=async()=>{
   const file=input.files[0];input.remove();if(!file)return;
-  try{if(file.size>MAX_BYTES)throw Error('檔案太大，無法開啟。');const incoming=validate(JSON.parse(await file.text()));if(incoming.lesson!==book.lesson)throw Error('這份筆記屬於第'+(incoming.lesson==='lesson9'?'九':'八')+'課，請先進入該課再開啟。');
+  try{if(file.size>MAX_BYTES)throw Error('檔案太大，無法開啟。');const incoming=validate(JSON.parse(await file.text()));if(incoming.lesson!==book.lesson)throw Error('這份筆記屬於第'+lessonNumbers[incoming.lesson]+'課，請先進入該課再開啟。');
    const apply=()=>{const before=clone(book);book=incoming;remember(before);saveLocal();setMode('view');redraw();toast('已開啟筆記，可以繼續書寫。')};
    if(Object.values(book.surfaces).some(s=>s.length)){
     const side=panel?.classList.contains('right')?'right':'left';closePanel();panel=document.createElement('section');panel.className='ink-panel '+side;panel.setAttribute('aria-label','確認開啟筆記');
@@ -261,7 +262,7 @@ function finishGesture(cancel=false){
 }
 function beforeChange(){document.querySelectorAll('[data-ink-action="paint"]').forEach(b=>penPresses.get(b)?.cancel());finishGesture(true);closePanel();setMode('view');surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null}
 function refresh(){
- finishGesture(true);surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null;activateLesson(document.body.dataset.lesson==='lesson9'?'lesson9':'lesson8');setupTools();
+ finishGesture(true);surface?.light?.destroy();surface?.observer?.disconnect();surface?.svg.remove();surface=null;activateLesson(lessonNumbers[document.body.dataset.lesson]?document.body.dataset.lesson:'lesson8');setupTools();
  const dialog=document.getElementById('lesson-note'),root=dialog.open?dialog.querySelector('.note-paper'):document.querySelector('.continuous-board');
  if(!root){syncMode();return}
  const key=dialog.open?'note:'+dialog.dataset.note:book.lesson;

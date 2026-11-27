@@ -348,15 +348,15 @@ function closeLessonNote(){
  lessonInk.beforeChange();dialog.close();dialog.classList.remove('lesson9-note');delete dialog.dataset.lesson9Note;
  const token=noteOpener?.closest('[data-token]')?.dataset.token;
  const id=noteOpener?.dataset.lesson9Note;
- resizeReading(token);
+ if(typeof resizeReading==='function')resizeReading(token);
  lessonInk.refresh();
  const opener=noteOpener?.isConnected?noteOpener:document.querySelector(`[data-token="${token}"] [data-lesson9-note="${id}"]`);
  opener?.focus({preventScroll:true});noteOpener=null;
 }
-function openLessonNote(id,opener){
- const content=noteContent(id);if(!content)return;
+function openLessonNote(id,opener,content=noteContent(id),prefix='l9-'){
+ if(!content)return;
  const dialog=document.getElementById('lesson-note');lessonInk.beforeChange();noteOpener=opener;
- dialog.dataset.note='l9-'+id;dialog.dataset.lesson9Note=id;dialog.classList.add('lesson9-note');
+ dialog.dataset.note=prefix+id;dialog.dataset.lesson9Note=id;dialog.classList.add('lesson9-note');
  const destination=opener.classList.contains('practice-note-link')?'練習':'課文';
  const close=side=>`<div class="note-controls note-controls-${side}"><button class="note-close" data-lesson9-close aria-label="${side==='left'?'左':'右'}側關閉解說，返回${destination}" title="關閉解說，返回${destination}"><span aria-hidden="true">×</span></button></div>`;
  dialog.innerHTML=`<div class="note-header"><p>老師補充</p></div><div class="note-middle"><nav class="note-tools" data-ink-side="left" aria-label="解說左側畫筆工具"></nav><div class="note-content" tabindex="0" role="region" aria-label="解說內容，可上下捲動"><div class="note-paper"><p class="kicker">${content.category}</p><h1 id="note-title">${content.title}</h1><div class="board">${content.html}</div></div></div><nav class="note-tools" data-ink-side="right" aria-label="解說右側畫筆工具"></nav></div><div class="note-footer">${close('left')}<span class="lesson9-return-hint">關閉後，回到原來的${destination}</span>${close('right')}</div>`;
@@ -519,6 +519,6 @@ function layout(anchor){
  if(anchor || requested!==index)history.replaceState(history.state,'','#lesson9-text-'+(index+1));
  lessonInk.refresh();return index+1;
 }
-const api={practice,practicePages,practiceReader,layoutPractice,sections,countries,words,glyphs,pictureNotes,readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
+const api={openLessonNote,practice,practicePages,practiceReader,layoutPractice,sections,countries,words,glyphs,pictureNotes,readingLinks,readingLinkAnchor,readingLinkMarkup,knowledgeNotes,noteContent,tokensForLesson,paginate,studyMarks,studySegments,catalogue,placeholder,reader,layout,FONT,BLUE};
 if(typeof module!=='undefined'&&module.exports)module.exports=api;else window.lesson9=api;
 })();
