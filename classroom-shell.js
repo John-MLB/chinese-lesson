@@ -11,7 +11,7 @@
   frame.style.transform=`translate(0px,${(height-HEIGHT*scale)/2}px) scale(${scale})`;
  }
  const legacyPage='classroom.html?v=20261124-6';
- const unit4Page='unit4.html?v=2';
+ const unit4Page='unit4.html?v=3';
  let activePage;
  function pageFor(hash){
   return /^#(?:unit4$|lesson10(?:-|$))/.test(hash)?unit4Page:legacyPage;

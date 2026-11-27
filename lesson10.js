@@ -62,10 +62,11 @@ function lineMarkup(line, stanza, index) {
   const glyph=term?`<button class="learning-word" data-vocab="${term}" type="button" aria-label="${term}，字義與例句" aria-haspopup="dialog" ${i?'tabindex="-1"':''}>${char}</button>`:char;
   return `<span data-token="${token}">${glyph}</span>`;
  }).join('');
- const musicLink=stanza===1&&index===3
-  ? '<a class="lesson10-music-link" href="https://docs.google.com/document/d/1u8ZncBwNWFHqeUYCF2pceQCLBJuj38yuhu3pPdD16po/edit?usp=drivesdk&amp;ouid=108673303949062286007" target="_blank" rel="noopener noreferrer">音樂</a>'
+ const mediaLinks=stanza===1&&index===3
+  ? `<div class="lesson10-media"><a href="https://docs.google.com/document/d/1u8ZncBwNWFHqeUYCF2pceQCLBJuj38yuhu3pPdD16po/edit?usp=drivesdk&amp;ouid=108673303949062286007" target="_blank" rel="noopener noreferrer">音樂</a>
+    <a href="https://youtu.be/zrWLyjv_JBw" target="_blank" rel="noopener noreferrer">101夜故事影片</a></div>`
   : '';
- return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${line.split(/【([^】]+)】/).map((part,i)=>chars(part,i%2?part:null)).join('')}</div>${musicLink}</div>`;
+ return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${line.split(/【([^】]+)】/).map((part,i)=>chars(part,i%2?part:null)).join('')}</div>${mediaLinks}</div>`;
 }
 function reader(index) {
  const page = index===0?'108':stanzas[index-1][1];
