@@ -64,7 +64,7 @@ function lineMarkup(line, stanza, index) {
  }).join('');
  const mediaLinks=stanza===1&&index===3
   ? `<div class="lesson10-media"><a href="https://docs.google.com/document/d/1u8ZncBwNWFHqeUYCF2pceQCLBJuj38yuhu3pPdD16po/edit?usp=drivesdk&amp;ouid=108673303949062286007" target="_blank" rel="noopener noreferrer">音樂</a>
-    <a href="https://youtu.be/zrWLyjv_JBw" target="_blank" rel="noopener noreferrer">101夜故事影片</a></div>`
+    <a href="https://youtu.be/zrWLyjv_JBw" target="_blank" rel="noopener noreferrer">101夜故事影片</a><button type="button" data-middle-east aria-haspopup="dialog">中東世界</button></div>`
   : '';
  return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${line.split(/【([^】]+)】/).map((part,i)=>chars(part,i%2?part:null)).join('')}</div>${mediaLinks}</div>`;
 }
@@ -104,7 +104,26 @@ function vocabulary(term) {
 
 const app=document.querySelector('#app');
 const dialog=document.querySelector('#lesson-note');
+const movieDialog=document.querySelector('#middle-east-video');
+const movie=movieDialog.querySelector('video');
+const movieError=movieDialog.querySelector('[data-video-error]');
+let movieOpener=null;
 let currentRoute='';
+
+function playMovie(){
+ movie.play().catch(()=>{if(movie.error)movieError.hidden=false});
+}
+movieDialog.querySelector('[data-video-restart]').onclick=()=>{
+ movie.currentTime=0;
+ playMovie();
+};
+movieDialog.querySelector('[data-video-close]').onclick=()=>movieDialog.close();
+movie.addEventListener('error',()=>{movieError.hidden=false});
+movieDialog.addEventListener('close',()=>{
+ movie.pause();
+ if(movieOpener?.isConnected)movieOpener.focus({preventScroll:true});
+ movieOpener=null;
+});
 function render() {
  const hash=location.hash.slice(1);
  const route=hash==='lesson10-text'?'lesson10-text-1':hash;
@@ -113,6 +132,7 @@ function render() {
  if(route!==hash)history.replaceState(null,'','#'+route);
  lessonInk.beforeChange();
  if(dialog.open)dialog.close();
+ if(movieDialog.open)movieDialog.close();
  const match=/^lesson10-text-([1-6])$/.exec(route);
  const index=match?Number(match[1])-1:null;
  const section=route.replace('lesson10-','');
@@ -137,11 +157,18 @@ function render() {
 }
 
 app.addEventListener('click',event=>{
+ const opener=event.target.closest('[data-middle-east]');
+ if(opener){
+  movieOpener=opener;
+  movieDialog.showModal();
+  playMovie();
+  return;
+ }
  const button=event.target.closest('[data-vocab]');
  if(button)lesson9.openLessonNote('word-'+button.dataset.vocab,button,vocabulary(button.dataset.vocab),'l10-');
 });
 document.addEventListener('keydown',event=>{
- if(dialog.open||event.altKey||event.ctrlKey||event.metaKey||event.target.closest('button,a,input,textarea'))return;
+ if(dialog.open||movieDialog.open||event.altKey||event.ctrlKey||event.metaKey||event.target.closest('button,a,input,textarea'))return;
  const step={ArrowLeft:'1',ArrowRight:'-1'}[event.key];
  if(!step)return;
  const button=document.querySelector(`[data-step="${step}"]:not([hidden]):not(:disabled)`);
