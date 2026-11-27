@@ -112,14 +112,45 @@
 .lesson10-practice h1 { margin-bottom: 12px; }
 .lesson10-practice .practice-lead { font-weight: bold; color: #344f44; }
 .lesson10-practice .stroke-chart { display:block; height: 690px; max-width:100%; object-fit:contain; margin:auto; }
-.lesson10-glyphs { display:flex; flex-wrap:wrap; gap:16px; }
-.lesson10-glyphs div { display:flex; gap:8px; background:#f8ecd2; padding:8px 14px; border-radius:8px; }
-.lesson10-glyphs strong { font-size:1.6em; }
-.lesson10-glyphs span { writing-mode:vertical-rl; font-size:.6em; align-self:center; }
-.lesson10-practice dl { display:grid; grid-template-columns:max-content 1fr; column-gap:22px; }
-.lesson10-practice dd { margin:0; }
-.lesson10-listening { display:grid; grid-template-columns:minmax(260px, 520px) 1fr; gap:30px; align-items:start; }
-.lesson10-listening img { width:100%; max-height:680px; object-fit:contain; }
+.lesson10-practice.vertical-practice {
+  writing-mode: vertical-rl;
+  box-sizing: border-box;
+  height: calc(100dvh - 86px);
+  width: 100%;
+  padding: 14px 18px;
+  overflow: auto;
+  font: 400 48px/1.20 var(--font-kai);
+  line-break: strict;
+}
+.vertical-practice h1 {
+  margin: 0 0 0 20px;
+  font: 700 66px/1.1 var(--font-kai);
+  color: var(--green);
+}
+.vertical-practice p { margin: 0 0 0 16px; }
+.vertical-practice .practice-lead { padding-left: 12px; border-left: 2px solid #cbd9ca; }
+.lesson10-glyphs {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 14px;
+  margin-left: 16px;
+  background: #f8ecd2;
+  border-radius: 8px;
+  writing-mode: horizontal-tb;
+  font: 400 58px/1 var(--font-kai);
+}
+.lesson10-glyphs .vocab-zhuyin { font-size: 18px; }
+.lesson10-practice.practice-words { font-size: 44px; }
+.lesson10-word-definitions {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  padding: 0 10px;
+}
+.lesson10-word-definitions p { padding-right: 8px; border-right: 2px solid #cbd9ca; }
+.vertical-practice .button { align-self: flex-start; margin-left: 16px; padding: 13px 8px; font-size: 32px; }
+.lesson10-listening-art { display: block; height: 100%; width: auto; max-width: 490px; object-fit: contain; }
 .visually-hidden { position:absolute; width:1px; height:1px; clip-path:inset(50%); overflow:hidden; }
 
 .lesson10-media button {

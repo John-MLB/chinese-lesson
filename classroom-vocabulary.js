@@ -13,7 +13,7 @@ function annotatedTitle(term, pronunciation) {
   const letters = [...syllable.replace(/[ˊˇˋ˙]/g, '')];
   const cells = letters.map((letter, i) => `<span>${escape(letter)}${i === letters.length - 1 && tone && tone !== '˙'
    ? `<b class="vocab-tone">${tone}</b>` : ''}</span>`).join('');
-  return `<span class="vocab-glyph"><span>${escape(char)}</span><span class="vocab-zhuyin" aria-hidden="true">${tone==='˙'
+  return `<span class="vocab-glyph"><span>${escape(char)}</span><span class="vocab-zhuyin" role="img" aria-label="${escape(syllable)}">${tone==='˙'
    ? '<b class="vocab-neutral">˙</b>' : ''}${cells}</span></span>`;
  }).join('');
 }
@@ -30,5 +30,5 @@ function note(term, pronunciation, meaning, example, supplement) {
  return {category:'認識詞語',title:annotatedTitle(term, pronunciation),html:`<div class="vertical-vocab">
   <div class="vertical-vocab-body">${card('課文中的意思',meaning)}${card('例句',example)}${science}${picture}</div>${sources}</div>`};
 }
-window.classroomVocabulary={note};
+window.classroomVocabulary={note,annotatedTitle};
 })();

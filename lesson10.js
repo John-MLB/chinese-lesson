@@ -88,12 +88,13 @@ function practice(id) {
  const bodies={
   write:()=>art('lesson10-strokes','十五個生字的筆順圖','stroke-chart')+
    '<p class="visually-hidden">幻、牙、龐、旋、芝、搓、扁、盜、榮、瞬、邁、富、驗、困、遍</p>',
-  recognize:()=>`<p class="practice-lead">念一念，認識有<mark>扁</mark>的字。</p><div class="lesson10-glyphs">${[['偏','ㄆㄧㄢ'],['編','ㄅㄧㄢ'],['騙','ㄆㄧㄢˋ'],['遍','ㄅㄧㄢˋ'],['篇','ㄆㄧㄢ'],['匾','ㄅㄧㄢˇ'],['翩','ㄆㄧㄢ']].map(([glyph,sound])=>`<div><strong>${glyph}</strong><span>${sound}</span></div>`).join('')}</div>
+  recognize:()=>`<p class="practice-lead">念一念，認識有<mark>扁</mark>的字。</p><div class="lesson10-glyphs">${[['扁','ㄅㄧㄢˇ'],['偏','ㄆㄧㄢ'],['編','ㄅㄧㄢ'],['騙','ㄆㄧㄢˋ'],['遍','ㄅㄧㄢˋ'],['篇','ㄆㄧㄢ'],['匾','ㄅㄧㄢˇ'],['翩','ㄆㄧㄢ']].map(([glyph,sound])=>classroomVocabulary.annotatedTitle(glyph,sound)).join('')}</div>
    <p><mark>翩翩</mark>飛起把舞<mark>編</mark>，<br><mark>編</mark>織夢幻如詩<mark>篇</mark>。</p><p>牌<mark>匾</mark>內容已傳<mark>遍</mark>，<br>不<mark>偏</mark>頗也不欺<mark>騙</mark>。</p>`,
-  words:()=>`<p class="practice-lead">讀一讀和「山、水」有關的詞語，你有什麼發現呢？</p><p>喜愛大自然的王爺爺，年輕時到處<mark>遊山玩水</mark>。為了探訪各地的<mark>奇山異水</mark>，就算千里迢迢、<mark>跋山涉水</mark>，也樂此不疲。後來，他找到一個<mark>依山傍水</mark>的村落住下來，終日和<mark>青山綠水</mark>相伴，過著逍遙自在的生活。</p><dl>${mountainWords.map(([word,def])=>`<dt><mark>${word}</mark></dt><dd>${def}</dd>`).join('')}</dl><p>你還知道哪些和「山、水」有關的四字詞語呢？說一說這些詞語的意思。</p>`,
-  listen:()=>`<div class="lesson10-listening">${art('lesson10-listen','四格故事圖：洞門、大盜、黃金寶物與神燈巨人')}<div><p class="practice-lead">看圖聽故事，故事中有許多令人感到不可思議的事物。</p><a class="button primary" href="https://qr.knsh.com.tw/GQ7HZ" target="_blank" rel="noopener noreferrer">開啟課本聆聽音檔 ↗</a><ol><li>請和同學分享，在故事中，你發現了哪些奇幻的事物？</li><li>想一想，圖 4 中的人會說什麼呢？</li></ol></div></div>`
+  words:()=>`<p class="practice-lead">讀一讀和「山、水」有關的詞語，你有什麼發現呢？</p><p>喜愛大自然的王爺爺，年輕時到處<mark>遊山玩水</mark>。為了探訪各地的<mark>奇山異水</mark>，就算千里迢迢、<mark>跋山涉水</mark>，也樂此不疲。後來，他找到一個<mark>依山傍水</mark>的村落住下來，終日和<mark>青山綠水</mark>相伴，過著逍遙自在的生活。</p><div class="lesson10-word-definitions">${mountainWords.map(([word,def])=>`<p><mark>${word}</mark>　${def}</p>`).join('')}</div><p>你還知道哪些和「山、水」有關的四字詞語呢？說一說這些詞語的意思。</p>`,
+  listen:()=>`<p class="practice-lead">看圖聽故事，故事中有許多令人感到不可思議的事物。</p><a class="button primary" href="https://qr.knsh.com.tw/GQ7HZ" target="_blank" rel="noopener noreferrer">開啟課本聆聽音檔 ↗</a><p>一、請和同學分享，在故事中，你發現了哪些奇幻的事物？</p><p>二、想一想，圖四中的人會說什麼呢？</p>${art('lesson10-listen','四格故事圖：洞門、大盜、黃金寶物與神燈巨人','lesson10-listening-art')}`
  };
- return `<section class="lesson10-practice"><h1>${title}</h1>${bodies[id]()}</section>`;
+ const layout=id==='write'?'':` vertical-practice practice-${id}`;
+ return `<section class="lesson10-practice${layout}"><h1>${title}</h1>${bodies[id]()}</section>`;
 }
 
 const vocabularySupplements={
