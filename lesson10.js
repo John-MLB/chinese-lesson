@@ -167,6 +167,7 @@ function render() {
  else if(index!==null)app.innerHTML=reader(index);
  else if(sections.some(s=>s[0]===section&&s[0]!=='text-1'))app.innerHTML=practice(section);
  else app.innerHTML=catalogue();
+ annotateLesson10(app);
  app.scrollTop=0;
  window.scrollTo(0,0);
  lessonInk.refresh();
@@ -181,7 +182,11 @@ app.addEventListener('click',event=>{
   return;
  }
  const button=event.target.closest('[data-vocab]');
- if(button)lesson9.openLessonNote('word-'+button.dataset.vocab,button,vocabulary(button.dataset.vocab),'l10-');
+ if(button){
+  lesson9.openLessonNote('word-'+button.dataset.vocab,button,vocabulary(button.dataset.vocab),'l10-');
+  annotateLesson10(dialog);
+  lessonInk.refresh();
+ }
 });
 document.addEventListener('keydown',event=>{
  if(dialog.open||movieDialog.open||event.altKey||event.ctrlKey||event.metaKey||event.target.closest('button,a,input,textarea'))return;
@@ -190,6 +195,7 @@ document.addEventListener('keydown',event=>{
  const button=document.querySelector(`[data-step="${step}"]:not([hidden]):not(:disabled)`);
  if(button){event.preventDefault();button.click()}
 });
+document.querySelectorAll('body > header,[data-menu],[data-reader-control],[data-step],.nav-rail a,#middle-east-video h2,#middle-east-video [data-video-restart],#middle-east-video [data-video-error]').forEach(annotateLesson10);
 window.addEventListener('hashchange',render);
 window.addEventListener('popstate',render);
 render();

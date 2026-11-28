@@ -183,3 +183,53 @@
 #middle-east-video button { cursor: pointer; min-height: 46px; }
 #middle-east-video [data-video-close] { font: 36px/1 system-ui,sans-serif; min-width: 56px; padding: 0 10px; }
 #middle-east-video [data-video-error] { position: absolute; inset: 35% 12% auto; padding: 25px; background: #182c29; text-align: center; font-size: 30px; }
+
+/* Extra space between vertical columns accommodates individually positioned tones. */
+.lesson-reading { ruby-position: over; }
+.lesson-reading rt { font-size: .40em; font-weight: 400; color: #315b68; }
+.zhuyin-vertical {
+  display: inline-block;
+  position: relative;
+  inline-size: 1em;
+  block-size: 1.39em;
+  vertical-align: baseline;
+  text-indent: 0;
+}
+.zhuyin-vertical .vocab-glyph {
+  position: relative;
+  display: block;
+  inline-size: 1em;
+  block-size: 1.39em;
+  min-height: 0;
+  line-height: 1.08;
+  text-align: center;
+}
+.zhuyin-vertical .vocab-zhuyin {
+  position: absolute;
+  writing-mode: horizontal-tb;
+  top: 50%;
+  right: 0;
+  width: 1.35em;
+  margin: 0;
+  transform: translateY(-50%);
+  font-size: .29em;
+}
+.zhuyin-vertical .vocab-tone, .zhuyin-vertical .vocab-neutral { font-size: .86em; }
+.lesson10-verse { --verse-font: min(74px, 8.82cqh, 6.3cqw); }
+.art-genie .lesson10-verse { --verse-font: min(69px, 8.1cqh, 6.3cqw); }
+.verse-text { line-height: 1.42; }
+.story-copy { font-size: min(72px, 10.5cqh, 5.4cqw); }
+.story-copy p { line-height: 1.46; }
+.vertical-practice { line-height: 1.44; }
+.lesson10-practice.vertical-practice { font-size: 46px; line-height: 1.44; }
+#lesson-note .vertical-vocab-card p { line-height: 1.46; }
+#lesson-note .vertical-vocab-card h3 { line-height: 1.44; }
+.zhuyin-vertical .vocab-glyph > span:first-child {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 1em;
+  height: 1em;
+}
+.zhuyin-vertical .vocab-zhuyin { right: .025em; width: 1.19em; }
+.lesson10-practice.practice-words { font-size: 39px; }
