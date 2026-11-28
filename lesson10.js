@@ -145,7 +145,7 @@ function vocabulary(term) {
 }
 function shapeNote(char){
  const rows=lesson10Glyphs[char][2];
- return {category:'字音字形辨析',title:char,html:`<div class="shape-grid">${rows.map(([glyph,sound,...examples])=>`<section><h3>${classroomVocabulary.annotatedTitle(glyph,sound)}</h3>${examples.map(example=>`<p>${example}</p>`).join('')}</section>`).join('')}</div>`};
+ return {category:'字音字形辨析',title:char,html:`<div class="shape-comparison"><div class="shape-brace" aria-hidden="true"><svg viewBox="0 0 44 22"><path d="M0 17H7Q20 17 22 4Q24 17 37 17H44"/></svg></div><div class="shape-grid">${rows.map(([glyph,sound,...examples])=>`<section><h3>${classroomVocabulary.annotatedTitle(glyph,sound)}</h3>${examples.map(example=>`<p>${example}</p>`).join('')}</section>`).join('')}</div></div>`};
 }
 function toggleRhetoric(button){
  const stanza=app.querySelector('[data-stanza="2"]');
@@ -203,7 +203,7 @@ function render() {
  else if(index!==null)app.innerHTML=reader(index);
  else if(sections.some(s=>s[0]===section&&s[0]!=='text-1'))app.innerHTML=practice(section);
  else app.innerHTML=catalogue();
- annotateLesson10(app);
+ if(!isUnit)annotateLesson10(app);
  app.scrollTop=0;
  window.scrollTo(0,0);
  lessonInk.refresh();
@@ -225,7 +225,7 @@ app.addEventListener('click',event=>{
   const term=word?.dataset.vocab;
   const char=shape?.dataset.shape;
   lesson9.openLessonNote('word-'+(term||'字'+char),word||shape,term?vocabulary(term):shapeNote(char),'l10-');
-  annotateLesson10(dialog);
+  annotateLesson10(dialog.querySelector('.note-paper'));
   lessonInk.refresh();
  }
 });
@@ -236,7 +236,7 @@ document.addEventListener('keydown',event=>{
  const button=document.querySelector(`[data-step="${step}"]:not([hidden]):not(:disabled)`);
  if(button){event.preventDefault();button.click()}
 });
-document.querySelectorAll('body > header,[data-menu],[data-reader-control],[data-step],.nav-rail a,#middle-east-video h2,#middle-east-video [data-video-restart],#middle-east-video [data-video-error]').forEach(annotateLesson10);
+document.querySelectorAll('body > header,#middle-east-video [data-video-error]').forEach(annotateLesson10);
 window.addEventListener('hashchange',render);
 window.addEventListener('popstate',render);
 render();

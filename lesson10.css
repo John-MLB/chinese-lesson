@@ -218,8 +218,8 @@
 .lesson10-verse { --verse-font: min(74px, 8.82cqh, 6.3cqw); }
 .art-genie .lesson10-verse { --verse-font: min(69px, 8.1cqh, 6.3cqw); }
 .verse-text { line-height: 1.435; }
-.story-copy { font-size: min(72px, 10.5cqh, 5.4cqw); }
-.story-copy p { line-height: 1.495; }
+.story-copy { font-size: min(65px, 9.8cqh, 5cqw); }
+.story-copy p { line-height: 1.99; }
 .vertical-practice { line-height: 1.44; }
 .lesson10-practice.vertical-practice { font-size: 46px; line-height: 1.465; }
 #lesson-note .vertical-vocab-card p { line-height: 1.495; }
@@ -239,10 +239,10 @@
 .study-blue { color: #005ead; }
 .study-term .study-outline {
   position: absolute;
-  inset: 0;
+  inset: 0 -9px 0 -3px;
   min-height: 0;
-  width: 100%;
-  height: 100%;
+  width: auto;
+  height: auto;
   padding: 0;
   border: 4.5px solid #b22526;
   border-radius: 9px;
@@ -257,8 +257,10 @@
   color: #b22526;
   pointer-events: none;
 }
-.study-number { writing-mode: horizontal-tb; top: -.48em; right: -.27em; font: 700 .75em/1 system-ui,sans-serif; }
-.verse-line:has(.study-extra) { margin-right: .98em; }
+.study-number { writing-mode: horizontal-tb; top: -.64em; left: calc(100% + 15px); transform: scaleX(.65); transform-origin: left; font: 700 .75em/1 system-ui,sans-serif; }
+.verse-line:has(.study-term) { margin-right: .65em; }
+.verse-line:has(.study-extra) { margin-right: 1.03em; }
+.verse-line:has(.shape-trigger) { margin-left: .24em; }
 .verse-line .study-extra {
   bottom: .02em;
   left: calc(100% + .30em);
@@ -272,7 +274,7 @@
 .shape-anchor .shape-trigger {
   position: absolute;
   z-index: 4;
-  left: -.5em;
+  left: -32px;
   top: 38%;
   padding: 0;
   width: 22px;
@@ -285,6 +287,7 @@
   font: 16px/1 var(--font-kai);
   cursor: pointer;
 }
+.shape-anchor { display: inline-block; }
 .shape-trigger::before { content: '字'; }
 .rhetoric-buttons { display: inline-flex; gap: 8px; margin-right: 12px; }
 .rhetoric-buttons button { color: #813921; background: #fff9dc; border: 1px solid #b17a3e; border-radius: 5px; padding: 3px 10px; }
@@ -299,3 +302,31 @@
 .shape-grid section { padding: 10px 15px; min-height: 320px; background: #edf6ee; border: 1px solid #a9c6bb; border-radius: 10px; }
 #lesson-note .shape-grid h3 { margin: 0 0 10px; font: 400 45px/1.1 var(--font-kai); }
 #lesson-note .shape-grid p { writing-mode: vertical-rl; display: inline-block; margin: 0 2px; vertical-align: top; font: 400 38px/1.48 var(--font-kai); }
+
+
+.shape-comparison { width: fit-content; max-width: 100%; margin: 0 auto; }
+.shape-brace {
+  position: relative;
+  height: 19px;
+  margin: 12px 16px 10px;
+  border: 3px solid #263c39;
+  border-bottom: 0;
+  border-radius: 16px 16px 0 0;
+}
+.shape-brace svg {
+  position: absolute;
+  width: 44px;
+  height: 22px;
+  top: -19px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--paper);
+  fill: none;
+  stroke: #263c39;
+  stroke-width: 3;
+  stroke-linejoin: round;
+}
+.story-copy .study-term { margin-right: .7em; }
+.art-cave .lesson10-verse { --verse-font: min(59px, 7.4cqh, 5.0cqw); }
+.story-copy .study-number { top: 0; }
+.verse-line .study-extra:not(.above) { top: calc(100% + 2px); bottom: auto; }
