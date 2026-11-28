@@ -361,3 +361,7 @@
 .art-cave .lesson10-verse { --verse-font: min(59px, 7.4cqh, 5.0cqw); }
 .story-copy .study-number { top: 0; }
 .verse-line .study-extra:not(.above) { top: calc(100% + 2px); bottom: auto; }
+
+/* The first column on p. 111 already has a vocabulary number and a supplement. */
+.art-cave .mark-repeat .rhetoric-repeat { top: calc(100% + 8px); left: 0; }
+.art-cave .mark-personify .rhetoric-personify { top: calc(100% + 8px); left: 57px; }

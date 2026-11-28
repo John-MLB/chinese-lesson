@@ -88,7 +88,7 @@ function lineMarkup(line, stanza, index) {
   ? `<div class="lesson10-media"><a href="https://docs.google.com/document/d/1u8ZncBwNWFHqeUYCF2pceQCLBJuj38yuhu3pPdD16po/edit?usp=drivesdk&amp;ouid=108673303949062286007" target="_blank" rel="noopener noreferrer">音樂</a>
     <a href="https://youtu.be/zrWLyjv_JBw" target="_blank" rel="noopener noreferrer">101夜故事影片</a><button type="button" data-middle-east aria-haspopup="dialog">中東世界</button></div>`
   : '';
- return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${stanza===2&&index===0?'<span class="rhetoric-repeat">類疊修辭</span><span class="rhetoric-personify">轉化修辭</span>':''}${markedText(line,108+stanza,index+1,i=>`l${stanza}-r${index}-c${i}`)}</div>${mediaLinks}${stanza===2&&index===0?`<div class="rhetoric-buttons" role="group" aria-label="修辭標記"><button type="button" data-rhetoric="repeat" aria-label="類疊修辭" aria-pressed="false">修辭</button><button type="button" data-rhetoric="personify" aria-label="轉化修辭" aria-pressed="false">修辭</button></div>`:''}</div>`;
+ return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${(stanza===2||stanza===3)&&index===0?'<span class="rhetoric-repeat">類疊修辭</span><span class="rhetoric-personify">轉化修辭</span>':''}${markedText(line,108+stanza,index+1,i=>`l${stanza}-r${index}-c${i}`)}</div>${mediaLinks}${(stanza===2||stanza===3)&&index===0?`<div class="rhetoric-buttons" role="group" aria-label="修辭標記"><button type="button" data-rhetoric="repeat" aria-label="類疊修辭" aria-pressed="false">修辭</button><button type="button" data-rhetoric="personify" aria-label="轉化修辭" aria-pressed="false">修辭</button></div>`:''}</div>`;
 }
 function reader(index) {
  const page = index===0?'108':stanzas[index-1][1];
@@ -148,7 +148,7 @@ function shapeNote(char){
  return {category:'字音字形辨析',title:char,html:`<div class="shape-comparison"><div class="shape-brace" aria-hidden="true"><svg viewBox="0 0 44 22"><path d="M0 17H7Q20 17 22 4Q24 17 37 17H44"/></svg></div><div class="shape-grid">${rows.map(([glyph,sound,...examples])=>`<section><h3>${classroomVocabulary.annotatedTitle(glyph,sound)}</h3>${examples.map(example=>`<p>${example}</p>`).join('')}</section>`).join('')}</div></div>`};
 }
 function toggleRhetoric(button){
- const stanza=app.querySelector('[data-stanza="2"]');
+ const stanza=button.closest(".lesson10-verse");
  const key=button.dataset.rhetoric;
  const active=stanza.classList.toggle('mark-'+key);
  button.setAttribute('aria-pressed',String(active));
