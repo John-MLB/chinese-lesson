@@ -258,8 +258,17 @@
   pointer-events: none;
 }
 .study-number { writing-mode: horizontal-tb; top: -.48em; right: -.27em; font: 700 .75em/1 system-ui,sans-serif; }
-.study-extra { bottom: .05em; right: -.22em; font: 400 .54em/1 var(--font-kai); }
-.study-extra.above { bottom: auto; top: -.12em; }
+.verse-line:has(.study-extra) { margin-right: .98em; }
+.verse-line .study-extra {
+  bottom: .02em;
+  left: calc(100% + .30em);
+  writing-mode: horizontal-tb;
+  padding: .08em .07em;
+  border-radius: .14em;
+  background: #fff8e9;
+  font: 400 .70em/1 var(--font-kai);
+}
+.verse-line .study-extra.above { bottom: auto; top: .70em; }
 .shape-anchor .shape-trigger {
   position: absolute;
   z-index: 4;
@@ -290,4 +299,3 @@
 .shape-grid section { padding: 10px 15px; min-height: 320px; background: #edf6ee; border: 1px solid #a9c6bb; border-radius: 10px; }
 #lesson-note .shape-grid h3 { margin: 0 0 10px; font: 400 45px/1.1 var(--font-kai); }
 #lesson-note .shape-grid p { writing-mode: vertical-rl; display: inline-block; margin: 0 2px; vertical-align: top; font: 400 38px/1.48 var(--font-kai); }
-.study-term:has(.study-extra.above) .study-number { top: -.73em; }
