@@ -313,9 +313,22 @@
 .verse-text { position: relative; }
 .mark-repeat .verse-line:nth-child(1) .verse-text,
 .mark-personify .verse-text { background: #ffe15183; border-radius: 8px; }
-.verse-text .rhetoric-repeat,.verse-text .rhetoric-personify { display: none; position: absolute; z-index: 3; writing-mode: horizontal-tb; white-space: nowrap; font: 700 20px/1.2 var(--font-kai); padding: 4px 8px; color: #7a3615; background: #fff3ad; border-radius: 5px; }
-.mark-repeat .rhetoric-repeat { display: block; top: calc(2 * var(--verse-font) + 8px); left: calc(100% + 9px); width: 1.7em; writing-mode: vertical-rl; }
-.mark-personify .rhetoric-personify { display: block; bottom: 100%; right: 0; }
+.verse-text .rhetoric-repeat,.verse-text .rhetoric-personify {
+  display: none;
+  position: absolute;
+  z-index: 3;
+  left: calc(100% + 9px);
+  writing-mode: vertical-rl;
+  white-space: nowrap;
+  font: 700 32px/1.2 var(--font-kai);
+  padding: 6px 5px;
+  color: #7a3615;
+  background: #fff3ad;
+  border: 1px solid #b17a3e;
+  border-radius: 5px;
+}
+.mark-repeat .rhetoric-repeat { display: block; top: calc(2 * var(--verse-font) + 8px); }
+.mark-personify .rhetoric-personify { display: block; top: calc(2 * var(--verse-font) + 158px); }
 .shape-grid { display: flex; flex-direction: row-reverse; justify-content: center; gap: 16px; margin-inline: auto; flex-wrap: wrap; }
 .shape-grid section { padding: 10px 15px; min-height: 320px; background: #edf6ee; border: 1px solid #a9c6bb; border-radius: 10px; }
 #lesson-note .shape-grid h3 { margin: 0 0 10px; font: 400 45px/1.1 var(--font-kai); }
