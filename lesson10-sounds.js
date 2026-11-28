@@ -7,7 +7,7 @@ window.annotateLesson10 = function(root) {
  const overrides=Object.keys(lesson10Phrases).sort((a,b)=>b.length-a.length);
  const walker=document.createTreeWalker(root,NodeFilter.SHOW_TEXT,{
   acceptNode(node){
-   return node.parentElement.closest('.vocab-glyph,.lesson-reading,.visually-hidden,.study-extra,.rhetoric-repeat,.rhetoric-personify,script,style,svg')
+   return node.parentElement.closest('.vocab-glyph,.lesson-reading,.visually-hidden,.study-extra,.rhetoric-buttons,.rhetoric-repeat,.rhetoric-personify,script,style,svg')
     ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT;
   }
  });

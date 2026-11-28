@@ -88,7 +88,7 @@ function lineMarkup(line, stanza, index) {
   ? `<div class="lesson10-media"><a href="https://docs.google.com/document/d/1u8ZncBwNWFHqeUYCF2pceQCLBJuj38yuhu3pPdD16po/edit?usp=drivesdk&amp;ouid=108673303949062286007" target="_blank" rel="noopener noreferrer">音樂</a>
     <a href="https://youtu.be/zrWLyjv_JBw" target="_blank" rel="noopener noreferrer">101夜故事影片</a><button type="button" data-middle-east aria-haspopup="dialog">中東世界</button></div>`
   : '';
- return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${stanza===2&&index===0?'<span class="rhetoric-repeat">類疊修辭</span><span class="rhetoric-personify">轉化修辭</span>':''}${markedText(line,108+stanza,index+1,i=>`l${stanza}-r${index}-c${i}`)}</div>${mediaLinks}</div>`;
+ return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${stanza===2&&index===0?'<span class="rhetoric-repeat">類疊修辭</span><span class="rhetoric-personify">轉化修辭</span>':''}${markedText(line,108+stanza,index+1,i=>`l${stanza}-r${index}-c${i}`)}</div>${mediaLinks}${stanza===2&&index===0?`<div class="rhetoric-buttons" role="group" aria-label="修辭標記"><button type="button" data-rhetoric="repeat" aria-label="類疊修辭" aria-pressed="false">修辭</button><button type="button" data-rhetoric="personify" aria-label="轉化修辭" aria-pressed="false">修辭</button></div>`:''}</div>`;
 }
 function reader(index) {
  const page = index===0?'108':stanzas[index-1][1];
@@ -96,7 +96,7 @@ function reader(index) {
   ? `<div class="story-copy"><h2>故事便利貼</h2><p>${markedText(story,108,undefined,i=>'story-c'+i)}</p></div>`
   : `<div class="lesson10-verse" data-stanza="${index}">${stanzas[index-1][3].map((line,i)=>lineMarkup(line,index,i)).join('')}<h2>（第${stanzas[index-1][0]}段）</h2></div>`;
  const image=index===0?'city':stanzas[index-1][2];
- return `<div class="continuous-board lesson10-reader art-${image}" data-lesson="lesson10" aria-label="${index===0?'故事便利貼':'第'+stanzas[index-1][0]+'段，每欄一句，由右向左閱讀'}">${body}</div><nav class="reading-pager" aria-label="課文翻頁">${page===110?`<div class="rhetoric-buttons"><button type="button" data-rhetoric="repeat" aria-label="類疊修辭" aria-pressed="false">修</button><button type="button" data-rhetoric="personify" aria-label="轉化修辭" aria-pressed="false">修</button></div>`:''}<span class="small">課本 ${page} 頁　｜　${index+1} / 6</span></nav>`;
+ return `<div class="continuous-board lesson10-reader art-${image}" data-lesson="lesson10" aria-label="${index===0?'故事便利貼':'第'+stanzas[index-1][0]+'段，每欄一句，由右向左閱讀'}">${body}</div><nav class="reading-pager" aria-label="課文翻頁"><span class="small">課本 ${page} 頁　｜　${index+1} / 6</span></nav>`;
 }
 const mountainWords=[
  ['遊山玩水','遊覽山水景致。'],
