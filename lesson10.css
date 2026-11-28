@@ -61,7 +61,7 @@
 }
 .lesson10-verse {
   --verse-font: min(85px, 9.05cqh, 9cqw);
-  gap: max(2px, .85cqw);
+  gap: max(3px, 1.275cqw);
   font-size: var(--verse-font);
 }
 .verse-line { position:relative; flex:none; display: flex; flex-direction: column; align-items: center; }
@@ -217,13 +217,13 @@
 .zhuyin-vertical .vocab-tone, .zhuyin-vertical .vocab-neutral { font-size: .86em; }
 .lesson10-verse { --verse-font: min(74px, 8.82cqh, 6.3cqw); }
 .art-genie .lesson10-verse { --verse-font: min(69px, 8.1cqh, 6.3cqw); }
-.verse-text { line-height: 1.42; }
+.verse-text { line-height: 1.435; }
 .story-copy { font-size: min(72px, 10.5cqh, 5.4cqw); }
-.story-copy p { line-height: 1.46; }
+.story-copy p { line-height: 1.495; }
 .vertical-practice { line-height: 1.44; }
-.lesson10-practice.vertical-practice { font-size: 46px; line-height: 1.44; }
-#lesson-note .vertical-vocab-card p { line-height: 1.46; }
-#lesson-note .vertical-vocab-card h3 { line-height: 1.44; }
+.lesson10-practice.vertical-practice { font-size: 46px; line-height: 1.465; }
+#lesson-note .vertical-vocab-card p { line-height: 1.495; }
+#lesson-note .vertical-vocab-card h3 { line-height: 1.465; }
 .zhuyin-vertical .vocab-glyph > span:first-child {
   position: absolute;
   top: 0;
