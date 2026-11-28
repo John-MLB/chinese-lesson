@@ -55,26 +55,48 @@ function catalogue() {
  return `<section class="lesson9-catalogue"><p class="kicker">第四單元・第十課</p><h1>奇幻旋律</h1><p class="sub">侯詩瑜</p><div class="lesson9-menu">${sections.map(([id,title,icon,description])=>`<a class="card" href="#lesson10-${id}"><span class="lesson9-card-icon" aria-hidden="true">${icon}</span><h2>${title}</h2><p>${description}</p></a>`).join('')}</div></section>`;
 }
 
+function markedText(text,page,line,token){
+ const chars=[...text.replace(/[【】]/g,'')];
+ const blue=[];
+ let inBlue=false;
+ for(const char of text){
+  if(char==='【')inBlue=true;
+  else if(char==='】')inBlue=false;
+  else blue.push(inBlue);
+ }
+ const ranges=lesson10Terms.map(([term,p,l,anchor,extra,above],i)=>{
+  const start=p===page&&l===line?chars.join('').indexOf(anchor||term):-1;
+  return {term,start,length:(anchor||term).length,n:i+1,extra,above};
+ }).filter(w=>w.start>=0);
+ let result='';
+ for(let i=0;i<chars.length;){
+  const word=ranges.find(w=>w.start===i);
+  const length=word?.length||1;
+  const body=chars.slice(i,i+length).map((char,j)=>{
+   const group=lesson10Glyphs[char];
+   const shape=group&&group[0]===page&&group[1]===line?
+    `<button type="button" class="shape-trigger" data-shape="${char}" aria-label="${char}的字音字形辨析" aria-haspopup="dialog"></button>`:'';
+   return `<span data-token="${token(i+j)}" class="${shape?'shape-anchor ':''}${blue[i+j]?'study-blue':''}">${char}${shape}</span>`;
+  }).join('');
+  result+=word?`<span class="study-term">${body}<button class="study-outline" type="button" data-vocab="${word.term}" aria-label="${word.term}，字義與例句" aria-haspopup="dialog"></button><span class="study-number" aria-hidden="true">${word.n}</span>${word.extra?`<small class="study-extra${word.above?' above':''}">${word.extra}</small>`:''}</span>`:body;
+  i+=length;
+ }
+ return result;
+}
 function lineMarkup(line, stanza, index) {
- let offset=0;
- const chars=(part, term)=>[...part].map((char,i)=>{
-  const token=`l${stanza}-r${index}-c${offset++}`;
-  const glyph=term?`<button class="learning-word" data-vocab="${term}" type="button" aria-label="${term}，字義與例句" aria-haspopup="dialog" ${i?'tabindex="-1"':''}>${char}</button>`:char;
-  return `<span data-token="${token}">${glyph}</span>`;
- }).join('');
  const mediaLinks=stanza===1&&index===3
   ? `<div class="lesson10-media"><a href="https://docs.google.com/document/d/1u8ZncBwNWFHqeUYCF2pceQCLBJuj38yuhu3pPdD16po/edit?usp=drivesdk&amp;ouid=108673303949062286007" target="_blank" rel="noopener noreferrer">音樂</a>
     <a href="https://youtu.be/zrWLyjv_JBw" target="_blank" rel="noopener noreferrer">101夜故事影片</a><button type="button" data-middle-east aria-haspopup="dialog">中東世界</button></div>`
   : '';
- return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${line.split(/【([^】]+)】/).map((part,i)=>chars(part,i%2?part:null)).join('')}</div>${mediaLinks}</div>`;
+ return `<div class="verse-line"><small aria-hidden="true">${index+1}</small><div class="verse-text">${stanza===2&&index===0?'<span class="rhetoric-repeat">類疊修辭</span><span class="rhetoric-personify">轉化修辭</span>':''}${markedText(line,108+stanza,index+1,i=>`l${stanza}-r${index}-c${i}`)}</div>${mediaLinks}</div>`;
 }
 function reader(index) {
  const page = index===0?'108':stanzas[index-1][1];
  const body = index===0
-  ? `<div class="story-copy"><h2>故事便利貼</h2><p>${[...story].map((c,i)=>`<span data-token="story-c${i}">${c}</span>`).join('')}</p></div>`
-  : `<div class="lesson10-verse">${stanzas[index-1][3].map((line,i)=>lineMarkup(line,index,i)).join('')}<h2>（第${stanzas[index-1][0]}段）</h2></div>`;
+  ? `<div class="story-copy"><h2>故事便利貼</h2><p>${markedText(story,108,undefined,i=>'story-c'+i)}</p></div>`
+  : `<div class="lesson10-verse" data-stanza="${index}">${stanzas[index-1][3].map((line,i)=>lineMarkup(line,index,i)).join('')}<h2>（第${stanzas[index-1][0]}段）</h2></div>`;
  const image=index===0?'city':stanzas[index-1][2];
- return `<div class="continuous-board lesson10-reader art-${image}" data-lesson="lesson10" aria-label="${index===0?'故事便利貼':'第'+stanzas[index-1][0]+'段，每欄一句，由右向左閱讀'}">${body}</div><nav class="reading-pager" aria-label="課文翻頁"><span class="small">課本 ${page} 頁　｜　${index+1} / 6</span></nav>`;
+ return `<div class="continuous-board lesson10-reader art-${image}" data-lesson="lesson10" aria-label="${index===0?'故事便利貼':'第'+stanzas[index-1][0]+'段，每欄一句，由右向左閱讀'}">${body}</div><nav class="reading-pager" aria-label="課文翻頁">${page===110?`<div class="rhetoric-buttons"><button type="button" data-rhetoric="repeat" aria-label="類疊修辭" aria-pressed="false">修</button><button type="button" data-rhetoric="personify" aria-label="轉化修辭" aria-pressed="false">修</button></div>`:''}<span class="small">課本 ${page} 頁　｜　${index+1} / 6</span></nav>`;
 }
 const mountainWords=[
  ['遊山玩水','遊覽山水景致。'],
@@ -115,7 +137,21 @@ const vocabularySupplements={
  搓:{fact:'兩手來回搓時，摩擦會把一部分動作的能量變成熱，所以手掌會暖起來。',source:['美國物理學會','https://www.aps.org/learning-resources/students/friction-fun']}
 };
 function vocabulary(term) {
- return classroomVocabulary.note(term,...words[term],vocabularySupplements[term]);
+ const [sound,meaning,example,lookup]=lesson10Definitions[term]||words[term];
+ const inherited={牙齒:'牙',搓揉:'搓'};
+ const note=classroomVocabulary.note(term,sound,meaning,example,vocabularySupplements[inherited[term]||term]);
+ if(lookup)note.html=note.html.replace(encodeURIComponent(term),encodeURIComponent(lookup)).replace('>萌典<',`>萌典・${lookup}<`);
+ return note;
+}
+function shapeNote(char){
+ const rows=lesson10Glyphs[char][2];
+ return {category:'字音字形辨析',title:char,html:`<div class="shape-grid">${rows.map(([glyph,sound,...examples])=>`<section><h3>${classroomVocabulary.annotatedTitle(glyph,sound)}</h3>${examples.map(example=>`<p>${example}</p>`).join('')}</section>`).join('')}</div>`};
+}
+function toggleRhetoric(button){
+ const stanza=app.querySelector('[data-stanza="2"]');
+ const key=button.dataset.rhetoric;
+ const active=stanza.classList.toggle('mark-'+key);
+ button.setAttribute('aria-pressed',String(active));
 }
 
 const app=document.querySelector('#app');
@@ -181,9 +217,14 @@ app.addEventListener('click',event=>{
   playMovie();
   return;
  }
- const button=event.target.closest('[data-vocab]');
- if(button){
-  lesson9.openLessonNote('word-'+button.dataset.vocab,button,vocabulary(button.dataset.vocab),'l10-');
+ const rhetoric=event.target.closest('[data-rhetoric]');
+ if(rhetoric){toggleRhetoric(rhetoric);return}
+ const word=event.target.closest('[data-vocab]');
+ const shape=event.target.closest('[data-shape]');
+ if(word||shape){
+  const term=word?.dataset.vocab;
+  const char=shape?.dataset.shape;
+  lesson9.openLessonNote('word-'+(term||'字'+char),word||shape,term?vocabulary(term):shapeNote(char),'l10-');
   annotateLesson10(dialog);
   lessonInk.refresh();
  }
